@@ -17,6 +17,7 @@ class Player:
         self.y = 0
         self.state = ["default", None]  # First is the name of the state, second is a place for data about the state
         self.inventory = []
+        self.visited_rooms = []
 
     def check_inventory(self, room, rooms, players):
         if player.gold >= 0:
@@ -288,6 +289,8 @@ if __name__ == "__main__":
                 player.y += v.Directions[chosen_direction].value[1]
                 for room in rooms:
                     if player.x == room.x and player.y == room.y:
+                        if room not in player.visited_rooms:
+                            player.visited_rooms.append(room)
                         if player.state[0] != "nope":
                             room.entered(player, rooms, players)
                         else:
@@ -302,7 +305,7 @@ if __name__ == "__main__":
 
                 if player.state[0] == "winner":
                     winner = True
-                    winning_player = player.name
+                    winning_player = player
                     time_taken = int(time() - game_start_time)
                     break
         for room in rooms:  # Moves any moving placed items
@@ -313,6 +316,7 @@ if __name__ == "__main__":
     time_taken_seconds = time_taken % 60
     time_taken_minutes = time_taken // 60
     time_taken_hours = time_taken_minutes // 60
-    print(f"\n{winning_player} has won the game!\nThe game took {time_taken_hours} hours, {time_taken_minutes} minutes,"
-          f" and {time_taken_seconds} seconds!")
+    print(f"\n{winning_player.name} has won the game!\nThe game took {time_taken_hours} hours, {time_taken_minutes}"
+          f" minutes, and {time_taken_seconds} seconds!\nDuring that time, they entered"
+          f" {len(winning_player.visited_rooms)} rooms out of {len(rooms)} total!")
     sleep(10)
