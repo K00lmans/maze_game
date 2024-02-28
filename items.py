@@ -24,7 +24,8 @@ of the room its in, the list of rooms, and the list of players and return the sa
 7: When your item is placed in a room, make sure to add a list with the first item being the function with the logic for
 that item and the second item being the Player class of the player who placed it.
 
-8: If you have an item that is in a room and needs to move, make sure to add it to the movement script in the main file.
+8: If you have an item that is in a room and needs to move, make sure to add a movement function and to call that from
+the main file.
 
 9: If you want to remove items, do not remove them from here. Instead, simply remove them from the items list in the
 variable file.
@@ -39,12 +40,12 @@ import global_vars as v
 
 
 # Helper Functions
-def check_if_used(usable, player_human):
+def check_if_used(usable: bool, player_human: bool) -> bool:
     """Asks the player if they want to use the item and returns the response as a bool"""
     if not usable:  # Simplifies in-function logic
         return False
     else:
-        if not player_human:
+        if not player_human:  # If an AI selects an item, you don't need to check if they want to use it
             return True
         else:
             selection_options = ["y", "n"]
@@ -57,14 +58,14 @@ def check_if_used(usable, player_human):
                 return False
 
 
-def trapped(player, room, placed_item):
+def trapped(player: v.Player, room: v.Room, placed_item: list):
     """Logic for placed trap"""
     player.gold -= 2
     placed_item[1].gold += 2
     if player.human:
         if player is placed_item[1]:
             print("\nYou walk into the room and get stuck in a trap. You realize that this is in fact your trap and"
-                  " facepalm. Thankfully when you check your pockets you still have the same amount of gold you have"
+                  " facepalm. Thankfully when you check your pockets you still have the same amount of gold you had"
                   " before and you breath a sigh of relief.")
         else:
             print("\nYou walk into the room and get stuck in a trap. You hear a loud vacuum sound and see two gold"
@@ -76,14 +77,14 @@ def trapped(player, room, placed_item):
             print(f"\n{player.name} has been trapped in {placed_item[1].name}'s trap and had 2 gold stolen.")
 
 
-def potion_gold(player, room, placed_item):
+def potion_gold(player: v.Player, room: v.Room, placed_item: list):
     """Logic for placed gold potion"""
     player.gold += 3
     room.placed_items.remove(placed_item)
     if player.human:
-        print("\nAs you walk into the room you notice a golden potion sitting in the floor without a cap or cork. Your"
+        print("\nAs you walk into the room you notice a golden potion sitting on the floor without a cap or cork. Your"
               " instincts take over and you drink it as quickly as possible to prevent violation of the 5 second rule."
-              " One you are done drinking you notice your pockets feel heavier and upon further investigation you"
+              " Once you are done drinking you notice your pockets feel heavier and upon further investigation you"
               " realize you have 3 extra gold for some reason. Neat! Upon further examination of the bottle you see a"
               f" small label saying 'Property of {placed_item[1].name}'.")
     else:
@@ -91,13 +92,13 @@ def potion_gold(player, room, placed_item):
             print(f"{player.name} has found and drank {placed_item[1].name}'s potion.")
 
 
-def encountered_goblin(player, room, placed_item):
+def encountered_goblin(player: v.Player, room: v.Room, placed_item: list):
     player.gold -= 1
     placed_item[1].gold += 1
     if player.human:
         print("\nYou enter the room and all of a sudden, a small green blur rushes up to you. Before you can even"
-              " think, you see the blur reach for your pockets and grab a coin out and run off again before you can"
-              " even do anything.")
+              " think, you see the blur reach for your pockets, grab a coin out and run off again before you can even"
+              " do anything.")
         if player is placed_item[1]:
             print("After a moment, the goblin walks back up to looking quite ashamed. It takes the gold coin it had"
                   " taken and meekly hands it back to you. You decide to take a moment to comfort your little goblin"
@@ -111,19 +112,20 @@ def encountered_goblin(player, room, placed_item):
             print(f"\n{placed_item[1].name}'s goblin pet has stolen a gold coin from {player.name}")
 
 
-def move_goblin(rooms, room):
+def move_goblin(rooms: list, room: v.Room):
     """Logic for moving the goblin"""
     room.placed_items.remove(encountered_goblin)
+    # He can cross the whole maze instantly because he is a fast little goober
     new_room = r.choice(rooms[:-1])  # Prevents it from being in the goal room
     new_room.placed_items.append(encountered_goblin)
 
 
 # Items
-def match(usable, player, players=None, current_room=None, rooms=None):
+def match(usable: bool, player: v.Player, players=None, current_room=None, rooms=None):
     """Identifies the rooms next to the room of the player who activated it"""
     if player.human:
         print("Match\n  A small match. Should create enough light to see into a room down a hallway.")
-    if check_if_used(usable, player):
+    if check_if_used(usable, player.human):
         player.inventory.remove(match)
         if player.human:
             print("\nYou strike the match and quickly look down the hallways of this room before it goes out.")
@@ -147,12 +149,12 @@ def match(usable, player, players=None, current_room=None, rooms=None):
                   " won't light again, so you toss it aside.")
 
 
-def swapper_remote(usable, player, players=None, room=None, rooms=None):
+def swapper_remote(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Swaps any two players"""
     if player.human:
         print("Swapper Remote\n  A small box labeled 'swapper remote'. There are two dials each with a name and a big"
               " button in the center.")
-    if check_if_used(usable, player):
+    if check_if_used(usable, player.human):
         player.inventory.remove(swapper_remote)
         if player.human:
             print("\nYou pull out the remote and start fiddling with the dials to try and decide who to swap.\n")
@@ -174,10 +176,10 @@ def swapper_remote(usable, player, players=None, room=None, rooms=None):
             print("\nAfter setting the dials to the correct selection you push the big red button and swap"
                   f" {swapped_players[0].name} and {swapped_players[1].name}. The device hums with energy and glows"
                   " bright red. You drop it as it starts to burn your fingers. As soon as it hits the ground, the extra"
-                  " burst of kinetic energy causes the whole device to burst. You try and shield yourself from the"
-                  " shrapnel, but it never comes. Looking back at where the device hit the ground there is nothing but"
-                  " a small scratch mark from where it hit the ground. It must have teleported itself after receiving"
-                  " the damage.")
+                  " burst of kinetic energy causes the whole device to explode. You try and shield yourself from the"
+                  " shrapnel, but it never comes. Looking back at where the device fell there is nothing but a small"
+                  " scratch mark from where it hit the ground. It must have teleported itself after receiving the"
+                  " damage.")
             if player in swapped_players:
                 print("For a brief moment you are sad that it did not work. You look up to head on your way once more,"
                       " only to realize that you are now in a different room. You smile to yourself, happy to know it"
@@ -189,6 +191,8 @@ def swapper_remote(usable, player, players=None, room=None, rooms=None):
             swapped_players = r.choice(players)
             if swapped_players[0].human or swapped_players[1].human:
                 print(f"{player.name} has swapped {swapped_players[0].name} and {swapped_players[1].name}.")
+
+        # If this code is cleaner, should be used to replace the swap code for the swapper_control room
         swapped_players_rooms = [None, None]
         for searched_room in rooms:
             if swapped_players[0].name in searched_room.occupants:
@@ -204,24 +208,24 @@ def swapper_remote(usable, player, players=None, room=None, rooms=None):
             swapped_player.state = ["default", None]
 
 
-def trap(usable, player, players=None, room=None, rooms=None):
+def trap(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Sets a trap in the room it's used in, steals two gold from each player who enters that room"""
     if player.human:
         print("Trap\n  A small bear trap that has been modified to house a small teleportation device and a gold"
               " magnet.")
-    if check_if_used(usable, player):
+    if check_if_used(usable, player.human):
         player.inventory.remove(trap)
         room.placed_items.append([trapped, player])
         if player.human:
             print("\nYou set down the trap in the room. Now the only thing for you to do is wait.")
 
 
-def gold_potion(usable, player, players=None, room=None, rooms=None):
+def gold_potion(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Put's three gold in a random nearby room"""
     if player.human:
         print("Gold Potion\n  A small golden potion. There is a label on the cork that warns that opening the potion"
-              " will cause it to teleport.")
-    if check_if_used(usable, player):
+              " may cause it to teleport.")
+    if check_if_used(usable, player.human):
         player.inventory.remove(gold_potion)
         found_new_room = False
         while not found_new_room:  # Reminder to get rid of the need for this while loop later
@@ -235,16 +239,17 @@ def gold_potion(usable, player, players=None, room=None, rooms=None):
         new_room.placed_items.append([potion_gold, player])
         if player.human:
             print("\nYou take the potion out of your pack and pop the cork. As soon as the cork leaves the bottle, you"
-                  " find your hands empty. The bottle has done what it said it would and teleported somewhere else. You"
+                  " find your hands empty. The bottle has done what it said it could and teleported somewhere else. You"
                   " do feel that it has stayed nearby.")
 
 
-def dagger(usable, player, players=None, room=None, rooms=None):
+def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Steal 4 gold from any player in the same room"""
+    # This item is mega busted, reminder to add use limit per room
     if player.human:
         print("Dagger\n  A sharp dagger. While you don't want to kill anyone, you sure could use this to extort some"
               " people.")
-    if check_if_used(usable, player):
+    if check_if_used(usable, player.human):
         if player.human:
             if len(room.occupants) > 1:  # AI players will make this check before using the item
                 other_players_in_room = []
@@ -275,12 +280,12 @@ def dagger(usable, player, players=None, room=None, rooms=None):
                 print("\nYou pull out your dagger, but realize that no one else is here.")
 
 
-def nope_picture(usable, player, players=None, room=None, rooms=None):
+def nope_picture(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Lets the player who activated it move to a room without activating that room"""
     if player.human:
         print("Nope Picture\n  It is a small picture of a man with a very long neck and a solid looking yellow hat. You"
               " get the feeling that this picture will guarantee safe travel.")
-    if check_if_used(usable, player):
+    if check_if_used(usable, player.human):
         player.inventory.remove(nope_picture)
         player.state = ["nope", None]
         if player.human:
@@ -289,18 +294,18 @@ def nope_picture(usable, player, players=None, room=None, rooms=None):
                   " your spirit animal. As you close your eyes and concentrate, suddenly, a spirit appears before you."
                   " The spirit is not your spirit animal, instead appearing to be a large man from a cold land. He is"
                   " wearing a knit cap and large mittens with a snowflake sewn on them. You ask for his advice on the"
-                  " matter, and he simply says one word.\n'Pootis'\nWith that word, you are pulled from you trance and"
-                  " it all clicks and you know what you must do. You lick your thumb, smush your thumb on your"
-                  " forehead, and stick the image to your head. It sticks just as you knew it would. You don't think it"
-                  " will stick past the next room, but you feel confidant in traveling onward.")
+                  " matter, and he simply says one word.\n'Pootis'\nWith that word, you are pulled from your trance and"
+                  " it all clicks. You know what you must do. You lick your thumb, smush your thumb on your  forehead,"
+                  " and stick the image to your head. It sticks just as you knew it would. You don't think it will"
+                  " stick past the next room, but you feel confidant in traveling onward.")
 
 
-def compass(usable, player, players=None, room=None, rooms=None):
+def compass(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Says the difference in location between the player and the goal"""
     direction_names = ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"]
     if player.human:
         print("Compass\n  A simple compass. On the back is a label stating that it points to what one desires most.")
-    if check_if_used(usable, player):
+    if check_if_used(usable, player.human):  # Warning! Math ahead!
         # Makes the compass not perfect in line with the lore of it pointing to what you desire most
         target_room = rooms[-1] if r.randint(0, len(rooms)) != 0 else r.choice(rooms)
         x_distance = target_room.x - room.x
@@ -313,6 +318,7 @@ def compass(usable, player, players=None, room=None, rooms=None):
         if x_sign != y_sign:
             supplemental_angle += 90
         current_room_to_goal_angle = m.degrees(m.atan(abs(x_distance) / abs(y_distance))) + supplemental_angle
+        # This line stolen from StackOverflow
         current_room_to_goal_angle_compass_name = direction_names[(round(round(current_room_to_goal_angle) / 45)) % 8]
         if player.human:
             # Add art of the compass pointing that direction later
@@ -322,11 +328,11 @@ def compass(usable, player, players=None, room=None, rooms=None):
                   " the compass back in you pack for now.")
 
 
-def pet_goblin(usable, player, players=None, room=None, rooms=None):
+def pet_goblin(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Moves around the maze and steals a gold from each player who enters a room he is in"""
     if player.human:
         print("Pet Goblin\n  A small tame goblin. It has told you that it will seek out gold for you.")
-    if check_if_used(usable, player):
+    if check_if_used(usable, player.human):
         player.inventory.remove(pet_goblin)
         room.placed_items.append([encountered_goblin, player])
         if player.human:

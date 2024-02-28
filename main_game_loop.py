@@ -8,66 +8,9 @@ import items as i
 v.init()  # Creates all the global variables for all the files to use
 
 
-class Player:
-    def __init__(self, is_human, player_name, starting_coins):
-        self.human = is_human
-        self.name = player_name
-        self.gold = starting_coins
-        self.x = 0
-        self.y = 0
-        self.state = ["default", None]  # First is the name of the state, second is a place for data about the state
-        self.inventory = []
-        self.visited_rooms = []
-
-    def check_inventory(self, room, rooms, players):
-        if player.gold >= 0:
-            print(f"\nYou check your pockets and find you have {self.gold} gold coins.")
-        else:
-            print(f"\nYou check your pockets and find a paper saying you are {-self.gold} gold"
-                  f" coins in debt.")
-        if len(player.inventory) == 0:
-            print("You currently have nothing in your pack.")
-            sleep(2.5)
-        else:
-            done_using_items = False
-            while not done_using_items:
-                print("\nYou have the following items in your pack:")
-                for item_number, item in enumerate(self.inventory):
-                    print(f"  {item_number + 1}: {item.__name__.replace('_', ' ').capitalize()}")
-                item_selected = False
-                while not item_selected:
-                    try:
-                        selection = int(input(f"Enter the number next to the item to view/use it and"
-                                              f" {len(self.inventory) + 1} to move on.\n"))
-                        item_selected = True
-                    except ValueError:
-                        print("Enter only the number of the item")
-                if 1 <= selection <= len(self.inventory):
-                    self.inventory[selection - 1](True, self, players, room, rooms)
-                    sleep(2.5)
-                else:
-                    done_using_items = True
-
-
-class Room:
-    def __init__(self, room_style: callable, x: int, y: int):
-        self.style = room_style
-        self.x = x
-        self.y = y
-        self.paths = []
-        self.occupants = []
-        self.placed_items = []  # All the items placed in a room
-
-    def entered(self, entering_player, room_list, player_list):
-        if len(self.placed_items) > 0:
-            for item in self.placed_items:
-                item[0](entering_player, self, item)
-                sleep(.5)
-        self.style(self, entering_player, room_list, player_list)
-
-
-def assign_rooms(maze_layout, special_rooms, good_room_count, bad_room_count, shop_count):
-    print("\nAssigning room styles...")
+def assign_rooms(maze_layout: list, special_rooms: list, good_room_count: int, bad_room_count: int, shop_count: int):
+    if __name__ == "__main__":  # Prevents excess printing when testing
+        print("\nAssigning room styles...")
 
     for count, room_style in enumerate(special_rooms):
         chosen_room = r.choice(maze_layout)
@@ -93,13 +36,18 @@ def assign_rooms(maze_layout, special_rooms, good_room_count, bad_room_count, sh
             chosen_room.style = rm.shop
             shop_count -= 1
 
-    return maze_layout
-
 
 def generate_maze_layout(room_count: int) -> list:
+    """Creates an entity, called room_crawler, which is randomly shifted north, east, south, and west. Each time this
+    entity moves, it first adds a path from the room at its old location to its new one if it does not already exist.
+    This allows the dynamic creation of oneway paths. After it moves, it checks if there is a room in its new location,
+    and if there is not adds an empty room to that location. It starts by adding the start room at (0, 0) and once it
+    has added the number of rooms stored in the room_count variable, it continues to move till it has found an empty
+    spot once more and then creates the goal room at that spot. This guarantees the goal room will have only one
+    entrance."""
     generated_rooms = []
     room_crawler = [0, 0]
-    generated_rooms.append(Room(rm.start, room_crawler[0], room_crawler[1]))
+    generated_rooms.append(v.Room(rm.start, room_crawler[0], room_crawler[1]))
 
     while room_count >= 0:
 
@@ -119,35 +67,35 @@ def generate_maze_layout(room_count: int) -> list:
                 new_room = False
                 break
         if new_room:
-            generated_rooms.append(Room(rm.empty if room_count != 0 else rm.goal, room_crawler[0], room_crawler[1]))
+            generated_rooms.append(v.Room(rm.empty if room_count != 0 else rm.goal, room_crawler[0], room_crawler[1]))
             room_count -= 1
-    if __name__ == "__main__":  # Prevents excess printing when speed testing
+    if __name__ == "__main__":  # Prevents excess printing when testing
         print("\nRoom layout generated...")
     return generated_rooms
 
 
-def generate_players(human_players, total_players, starter_gold):
+def generate_players(human_players: int, total_players: int, starter_gold: int) -> list:
     generated_players = []
     for player in range(total_players):
         if human_players > 0:
             generated_players.append(
-                Player(True, input(f"\nPlayer {player + 1}, what would you like to name your character?\n"),
+                v.Player(True, input(f"\nPlayer {player + 1}, what would you like to name your character?\n"),
                        starter_gold))
             human_players -= 1
         else:
-            generated_players.append(Player(False, r.choice(NPC_NAME_LIST), starter_gold))
+            generated_players.append(v.Player(False, r.choice(NPC_NAME_LIST), starter_gold))
     return generated_players
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # Allows for testing of this file's functions, also just good practice
     try:
         file = open("npc_names", "r")
     except FileNotFoundError:  # Allows this code to be run complied
         file = open("_internal\\npc_names", "r")
-    NPC_NAME_LIST = file.read().split('\n')
+    NPC_NAME_LIST = file.read().split('\n')  # Stolen from StackOverflow
     file.close()
 
-    print("Welcome to:\n\nMAZE GAME")
+    print("Welcome to:\n\nMAZE GAME")  # Replace with splash art
     sleep(5)
     human_player_count = 0
     while human_player_count == 0 or human_player_count > 10:
@@ -218,9 +166,10 @@ if __name__ == "__main__":
             except OverflowError:
                 print("Too many non-empty rooms")
 
-    # Makes sure at least half of the rooms are empty
+    # Removes special rooms if adding all enabled special rooms would make too many rooms not empty
     try:
-        enabled_special_rooms = r.sample(v.SPECIAL_ROOMS, int((total_rooms / 2) - (good_rooms + bad_rooms + shops)))
+        enabled_special_rooms = r.sample(enabled_special_rooms,
+                                         int((total_rooms / 2) - (good_rooms + bad_rooms + shops)))
     except ValueError:
         pass
     # Removes rooms related to a special room if the special room is not enabled
@@ -232,7 +181,8 @@ if __name__ == "__main__":
     print("\nGenerating Maze...")
     if total_rooms > 1500:  # After about that many rooms, maze generation can really slow down
         print("(This may take a moment, but you should have expected that you maniac)")
-    rooms = assign_rooms(generate_maze_layout(total_rooms), enabled_special_rooms, good_rooms, bad_rooms, shops)
+    rooms = generate_maze_layout(total_rooms)
+    assign_rooms(rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
     print("\nMaze generated! Your game will begin shortly.")
 
     sleep(1)
@@ -254,7 +204,7 @@ if __name__ == "__main__":
                 if player.x == room.x and player.y == room.y:
                     player_room = room
                     break
-            if type(player.state[0]) is not str:
+            if type(player.state[0]) is not str:  # Activates stuck spots
                 player_room.entered(player, rooms, players)
                 player.state[0](player)
                 sleep(2.5)
