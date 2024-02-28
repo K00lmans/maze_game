@@ -67,7 +67,8 @@ class Room:
 
 
 def assign_rooms(maze_layout, special_rooms, good_room_count, bad_room_count, shop_count):
-    print("\nAssigning room styles...")
+    if __name__ == "__main__":  # Prevents excess printing when testing
+        print("\nAssigning room styles...")
 
     for count, room_style in enumerate(special_rooms):
         chosen_room = r.choice(maze_layout)
@@ -121,7 +122,7 @@ def generate_maze_layout(room_count: int) -> list:
         if new_room:
             generated_rooms.append(Room(rm.empty if room_count != 0 else rm.goal, room_crawler[0], room_crawler[1]))
             room_count -= 1
-    if __name__ == "__main__":  # Prevents excess printing when speed testing
+    if __name__ == "__main__":  # Prevents excess printing when testing
         print("\nRoom layout generated...")
     return generated_rooms
 
