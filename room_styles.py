@@ -161,7 +161,8 @@ def goal(room_info: v.Room, player_profile: v.Player, rooms: list, players: list
     """Getting here first wins for that player"""
     player_profile.state = ["winner", None]
     if player_profile.human:
-        print("\nAt long last you have found it! *INSERT FOUND ITEM LATER*\nA WINNER IS YOU")  # Still need joke object
+        print("\nAt long last you have found it, the severed head of the king. He had an upside down ice cream cone on"
+              " his head for some reason! *INSERT FOUND ITEM LATER*\nA WINNER IS YOU")  # Still need joke object CHANGE
 
 
 def shop(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
