@@ -50,8 +50,8 @@ def generate_maze_layout(room_count: int) -> list:
     generated_rooms.append(v.Room(rm.start, room_crawler[0], room_crawler[1]))
 
     while room_count >= 0:
-
-        direction = r.choice(["NORTH", "EAST", "SOUTH", "WEST"])
+        possible_directions = ["NORTH", "EAST", "SOUTH", "WEST"]
+        direction = r.choice(possible_directions)
         for room in generated_rooms:  # Tries to add path to next room
             if room_crawler[0] == room.x and room_crawler[1] == room.y:
                 if direction not in room.paths:
