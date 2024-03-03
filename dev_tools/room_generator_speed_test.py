@@ -2,8 +2,8 @@
 
 If you move the room generation code to a different file, please change the import statement.
 
-All past times are stored in the room_generator_time_records file as average time to generate 50, 300, 550, 1050, 1550,
-1800, 2050 and 2300 rooms in milliseconds.
+All past times are stored in the room_generator_time_records.txt file as average time to generate 50, 300, 550, 1050,
+1550, 1800, 2050 and 2300 rooms in milliseconds.
 
 This code is not written for usability, use at your own risk.
 

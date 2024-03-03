@@ -89,9 +89,9 @@ def generate_players(human_players: int, total_players: int, starter_gold: int) 
 
 if __name__ == "__main__":  # Allows for testing of this file's functions, also just good practice
     try:
-        file = open("npc_names", "r")
+        file = open("npc_names.txt", "r")
     except FileNotFoundError:  # Allows this code to be run complied
-        file = open("_internal\\npc_names", "r")
+        file = open("_internal\\npc_names.txt", "r")
     NPC_NAME_LIST = file.read().split('\n')  # Stolen from StackOverflow
     file.close()
 
