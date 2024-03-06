@@ -49,9 +49,36 @@ def generate_maze_layout(room_count: int) -> list:
     room_crawler = [0, 0]
     generated_rooms.append(v.Room(rm.start, room_crawler[0], room_crawler[1]))
 
+    max_x_y = [0, 0]
+    min_x_y = [0, 0]
     while room_count >= 0:
-
-        direction = r.choice(["NORTH", "EAST", "SOUTH", "WEST"])
+        possible_directions = ["NORTH", "NORTH", "EAST", "EAST", "SOUTH", "SOUTH", "WEST", "WEST"]
+        # The 1.125, 1.25, and 1.5 are damper values to limit overcorrection
+        if max_x_y[0] > abs(min_x_y[0] * 1.125):
+            possible_directions.remove("EAST")
+            if max_x_y[0] > abs(min_x_y[0] * 1.25):
+                possible_directions.append("WEST")
+                if max_x_y[0] > abs(min_x_y[0] * 1.5):
+                    possible_directions.remove("EAST")
+        elif abs(min_x_y[0]) > (max_x_y[0] * 1.125):
+            possible_directions.remove("WEST")
+            if abs(min_x_y[0]) > (max_x_y[0] * 1.25):
+                possible_directions.append("EAST")
+                if abs(min_x_y[0]) > (max_x_y[0] * 1.5):
+                    possible_directions.remove("WEST")
+        if max_x_y[1] > abs(min_x_y[1] * 1.125):
+            possible_directions.remove("NORTH")
+            if max_x_y[1] > abs(min_x_y[1] * 1.25):
+                possible_directions.append("SOUTH")
+                if max_x_y[1] > abs(min_x_y[1] * 1.5):
+                    possible_directions.remove("NORTH")
+        elif abs(min_x_y[1]) > (max_x_y[1] * 1.125):
+            possible_directions.remove("SOUTH")
+            if abs(min_x_y[1]) > (max_x_y[1] * 1.25):
+                possible_directions.append("NORTH")
+                if abs(min_x_y[1]) > (max_x_y[1] * 1.5):
+                    possible_directions.remove("SOUTH")
+        direction = r.choice(possible_directions)
         for room in generated_rooms:  # Tries to add path to next room
             if room_crawler[0] == room.x and room_crawler[1] == room.y:
                 if direction not in room.paths:
@@ -60,6 +87,14 @@ def generate_maze_layout(room_count: int) -> list:
 
         room_crawler[0] += v.Directions[direction].value[0]
         room_crawler[1] += v.Directions[direction].value[1]
+        if room_crawler[0] > max_x_y[0]:
+            max_x_y[0] = room_crawler[0]
+        elif room_crawler[0] < min_x_y[0]:
+            min_x_y[0] = room_crawler[0]
+        if room_crawler[1] > max_x_y[1]:
+            max_x_y[1] = room_crawler[1]
+        elif room_crawler[1] < min_x_y[1]:
+            min_x_y[1] = room_crawler[1]
 
         new_room = True
         for room in generated_rooms:
@@ -179,7 +214,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
 
     players = generate_players(human_player_count, total_player_count, starting_gold)
     print("\nGenerating Maze...")
-    if total_rooms > 1500:  # After about that many rooms, maze generation can really slow down
+    if total_rooms > 1800:  # After about that many rooms, maze generation can really slow down
         print("(This may take a moment, but you should have expected that you maniac)")
     rooms = generate_maze_layout(total_rooms)
     assign_rooms(rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
