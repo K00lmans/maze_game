@@ -49,6 +49,7 @@ def generate_maze_layout(room_count: int) -> list:
     room_crawler = [0, 0]
     generated_rooms.append(v.Room(rm.start, room_crawler[0], room_crawler[1]))
 
+    room_crawler_room = generated_rooms[0]  # Keeps track of the room the room crawler is at to reduce repeated searches
     max_x_y = [0, 0]
     min_x_y = [0, 0]
     while room_count >= 0:
@@ -78,12 +79,10 @@ def generate_maze_layout(room_count: int) -> list:
                 possible_directions.append("NORTH")
                 if abs(min_x_y[1]) > (max_x_y[1] * 1.5):
                     possible_directions.remove("SOUTH")
+
         direction = r.choice(possible_directions)
-        for room in generated_rooms:  # Tries to add path to next room
-            if room_crawler[0] == room.x and room_crawler[1] == room.y:
-                if direction not in room.paths:
-                    room.paths.append(direction)
-                break
+        if direction not in room_crawler_room.paths:
+            room_crawler_room.paths.append(direction)
 
         room_crawler[0] += v.Directions[direction].value[0]
         room_crawler[1] += v.Directions[direction].value[1]
@@ -100,9 +99,11 @@ def generate_maze_layout(room_count: int) -> list:
         for room in generated_rooms:
             if room_crawler[0] == room.x and room_crawler[1] == room.y:
                 new_room = False
+                room_crawler_room = room
                 break
         if new_room:
             generated_rooms.append(v.Room(rm.empty if room_count != 0 else rm.goal, room_crawler[0], room_crawler[1]))
+            room_crawler_room = generated_rooms[-1]
             room_count -= 1
     if __name__ == "__main__":  # Prevents excess printing when testing
         print("\nRoom layout generated...")
@@ -214,7 +215,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
 
     players = generate_players(human_player_count, total_player_count, starting_gold)
     print("\nGenerating Maze...")
-    if total_rooms > 1800:  # After about that many rooms, maze generation can really slow down
+    if total_rooms > 2500:  # After about that many rooms, maze generation can really slow down
         print("(This may take a moment, but you should have expected that you maniac)")
     rooms = generate_maze_layout(total_rooms)
     assign_rooms(rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
