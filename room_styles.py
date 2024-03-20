@@ -624,7 +624,7 @@ def recall(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
             print("\nYou enter a large empty room. Wait, never mind it has a hole in the roof.\nDid it always have a"
                   " hole in the roof?")
         else:
-            print("\n You enter a large empty room. It reminds you of home.")
+            print("\nYou enter a large empty room. It reminds you of home.")
             display_players_in_room(room_info)
 
 

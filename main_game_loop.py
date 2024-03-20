@@ -45,6 +45,8 @@ def generate_maze_layout(room_count: int) -> list:
     has added the number of rooms stored in the room_count variable, it continues to move till it has found an empty
     spot once more and then creates the goal room at that spot. This guarantees the goal room will have only one
     entrance."""
+    time_of_last_player_update = time()
+    starting_room_count = room_count
     generated_rooms = []
     room_crawler = [0, 0]
     generated_rooms.append(v.Room(rm.start, room_crawler[0], room_crawler[1]))
@@ -105,6 +107,11 @@ def generate_maze_layout(room_count: int) -> list:
             generated_rooms.append(v.Room(rm.empty if room_count != 0 else rm.goal, room_crawler[0], room_crawler[1]))
             room_crawler_room = generated_rooms[-1]
             room_count -= 1
+            # Make sure the player is updated every second or so on generation progress
+            if (time() - time_of_last_player_update) >= 1:  # Done only when a room is added to keep run speed up
+                if __name__ == "__main__":  # Prevents excess printing when testing
+                    print(f"\nRoom generation {int(100 - ((room_count/starting_room_count) * 100))}% done.")
+                    time_of_last_player_update = time()
     if __name__ == "__main__":  # Prevents excess printing when testing
         print("\nRoom layout generated...")
     return generated_rooms
@@ -215,8 +222,6 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
 
     players = generate_players(human_player_count, total_player_count, starting_gold)
     print("\nGenerating Maze...")
-    if total_rooms > 2500:  # After about that many rooms, maze generation can really slow down
-        print("(This may take a moment, but you should have expected that you maniac)")
     rooms = generate_maze_layout(total_rooms)
     assign_rooms(rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
     print("\nMaze generated! Your game will begin shortly.")
