@@ -132,7 +132,7 @@ def start(room_info: v.Room, player_profile: v.Player, rooms: list, players: lis
     player_profile.gold += 1
     if player_profile.human:
         print("\nYou enter the room and see a large open hole where the ceiling should be. The room seems familiar to"
-              "you.\nAs your looking up you suddenly see a coin fall from the opening.\n+1 gold!")
+              " you.\nAs your looking up you suddenly see a coin fall from the opening.\n+1 gold!")
         display_players_in_room(room_info)
 
 
@@ -551,20 +551,20 @@ def pit_slide(room_info: v.Room, player_profile: v.Player, rooms: list, players:
 
 def swapper(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """Swaps them with another player"""
-    # Pretty sure this room might still be bugged, more investigation needed
     put_player_in_room(player_profile, room_info, rooms)  # Should prevent odd crashing issue
-    room_info.occupants.remove(player_profile.name)
     swapped_player = r.choice(players)
-    for room in rooms:
-        if swapped_player.name in room.occupants:
-            room.occupants.remove(swapped_player.name)
-            new_room = room
-            break
-    new_room.occupants.append(player_profile.name)
-    player_profile.x, player_profile.y = new_room.x, new_room.y
-    room_info.occupants.append(swapped_player.name)
-    swapped_player.x, swapped_player.y = room_info.x, room_info.y
-    swapped_player.state = ["default", None]  # Prevents stuck spot from carrying over
+    if swapped_player != player_profile:
+        room_info.occupants.remove(player_profile.name)
+        for room in rooms:
+            if swapped_player.name in room.occupants:
+                room.occupants.remove(swapped_player.name)
+                new_room = room
+                break
+        new_room.occupants.append(player_profile.name)
+        player_profile.x, player_profile.y = new_room.x, new_room.y
+        room_info.occupants.append(swapped_player.name)
+        swapped_player.x, swapped_player.y = room_info.x, room_info.y
+        swapped_player.state = ["default", None]  # Prevents stuck spot from carrying over
 
     if player_profile.human:
         print("\nYou enter a large empty room. Before you can start feeling lost you feel a large surge of energy flow"

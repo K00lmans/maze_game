@@ -153,7 +153,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
 
     # Default game values
     total_player_count = 4 if (human_player_count % 5) != 0 else human_player_count
-    starting_gold = total_player_count  # Compensates for charity room styles
+    starting_gold = total_player_count  # Compensates for charity room style
     total_rooms = 50
     enabled_special_rooms = v.SPECIAL_ROOMS.copy()
     # Recommended ratios

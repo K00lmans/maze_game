@@ -245,7 +245,7 @@ def gold_potion(usable: bool, player: v.Player, players=None, room=None, rooms=N
 
 def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Steal 4 gold from any player in the same room"""
-    # This item is mega busted, reminder to add use limit per room
+    # This whole thing needs a rewrite, make sure to do that when adding AI item use
     if player.human:
         print("Dagger\n  A sharp dagger. While you don't want to kill anyone, you sure could use this to extort some"
               " people.")
@@ -257,25 +257,47 @@ def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
                     if person.name in room.occupants:
                         other_players_in_room.append(person)
                 other_players_in_room.remove(player)
-                for player_in_room in other_players_in_room:
-                    player_in_room.gold -= 4
-                player.gold += 4 * len(other_players_in_room)
-                for player_number in range(len(other_players_in_room)):
-                    # Changes data from the Player class to the string of their names because when coding this
-                    # originally I forgot how my own data types worked and I can't be bothered to re-wright it right now
-                    other_players_in_room[player_number] = other_players_in_room[player_number].name
-                if len(other_players_in_room) == 1:
-                    print(f"You pull out your dagger and point it at {other_players_in_room[0]} and you tell them that"
-                          f" if they don't give you 4 gold, you are going to stab them. They quickly scrounge around in"
-                          f" their pockets and then hand over 4 gold. You put the gold in your pockets and then put"
-                          f" your dagger away.")
+                # The more people in the room, the more likely to fail
+                if r.randint(0, 10 - len(other_players_in_room)) != 0:
+                    for player_in_room in other_players_in_room:
+                        player_in_room.gold -= 4
+                    player.gold += 4 * len(other_players_in_room)
+                    for player_number in range(len(other_players_in_room)):
+                        other_players_in_room[player_number] = other_players_in_room[player_number].name
+                    if len(other_players_in_room) == 1:
+                        print(f"You pull out your dagger and point it at {other_players_in_room[0]} and you tell them"
+                              f" that if they don't give you 4 gold, you are going to stab them. They quickly scrounge"
+                              f" around in their pockets and then hand over 4 gold. You put the gold in your pockets"
+                              f" and then put your dagger away.")
+                    else:
+                        print(f"You pull out your dagger and wave it at {', '.join(other_players_in_room[:-1])}, and"
+                              f" {other_players_in_room[-1]}. You tell them that anyone who does not hand over 4 gold"
+                              f" is going to be stabbed. All of them quickly search through there pockets and toss the"
+                              f" 4 gold in your direction. You grab all of the gold off the floor while still holding"
+                              f" out your dagger, and only once all of the gold is safely in your pockets do you put"
+                              f" away the dagger.")
                 else:
-                    print(f"You pull out your dagger and wave it at {', '.join(other_players_in_room[:-1])}, and"
-                          f" {other_players_in_room[-1]}. You tell them that anyone who does not hand over 4 gold is"
-                          f" going to be stabbed. All of them quickly search through there pockets and toss the 4 gold"
-                          f" in your direction. You grab all of the gold off the floor while still holding out your"
-                          f" dagger, and only once all of the gold is safely in your pockets do you put away the"
-                          f" dagger.")
+                    player.inventory.remove(dagger)
+                    if len(other_players_in_room) == 1:
+                        print(f"You pull out your dagger and point it at {other_players_in_room[0]} and you tell them"
+                              f" that if they don't give you 4 gold, you are going to stab them. Before you can react,"
+                              f" they jump straight at you and tackle you to the ground. They pull the dagger out of"
+                              f" your hands, jump back up, and then smash the dagger against the floor, shattering it."
+                              f" You stare at them for a moment before deciding to pretend like nothing happened.")
+                    else:
+                        print(f"You pull out your dagger and wave it at {', '.join(other_players_in_room[:-1])}, and"
+                              f" {other_players_in_room[-1]}. You tell them that anyone who does not hand over 4 gold"
+                              f" is going to be stabbed. They all look at each other, nod, and then before you can"
+                              f" react, jump right at you and all dogpile you. You lose grip of the dagger and"
+                              f" {r.choice(other_players_in_room)} grabs it and jumps back up. As if on cue, everybody"
+                              f" else also slowly gets up. Once they are up, standing in front of you, they begin to"
+                              f" chant.\n\n'NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO"
+                              f" MORE'\n\nAs you stare in disbelief, the one who grabbed the dagger slowly raises it"
+                              f" above their head, and then suddenly and with surprising might, slam the dagger into"
+                              f" the ground, shattering it into a thousand pieces. As you stare in disbelief all the"
+                              f" others slacken their pose and begin politely talking amongst themselves like nothing"
+                              f" happened. You cautiously decide it might be best to follow their lead and go about"
+                              f" your businesses like nothing happened.")
             else:
                 print("\nYou pull out your dagger, but realize that no one else is here.")
 
