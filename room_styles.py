@@ -151,7 +151,7 @@ def empty(room_info: v.Room, player_profile: v.Player, rooms: list, players: lis
                   " could be called its face is covered in number pairs, all of them constantly shifting and changing"
                   " in a seemingly random pattern. You find yourself unable to tear your gaze away from the beast. You"
                   " start to feel fuzzy and your vision slowly narrows. You collapse.\n\nWhen you wake, the room just"
-                  " seems like normal. You feel lost.")
+                  " seems like normal. You feel misplaced.")
         else:
             print("\nYou enter a large empty room. You feel lost.")
         display_players_in_room(room_info)
@@ -310,10 +310,23 @@ def psycho(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
                     " form of art using only the characters from a printing press on the wall.",
                     "'oh no, you rolled a 3, you don't get to leave the pit'\n'and that's heads for the 50th time in a"
                     " row'\n'oh no, this d20 needs to go to dice jail...'\nYou notice they are surrounded by piles and"
-                    " piles of dice"]
+                    " piles of dice",
+                    "'...yjrm yjr tsmfpz esal...'\n'...yjrm yjr appq yjtpihj...'\n'...yjrm yjr tsmfpz esal...'\nYou"
+                    " notice that they are scrawling 2's and 1's on the wall.",
+                    "'mp... upi str yjr seslr zr...'\n'...smf yjrm yjr quyjpm esd s zpimyu!'\n'pg vpitdr yjr eptaf od"
+                    " gasy, jpe radr epiaf oy goy pm yjr rarqjsmyd smf yjr yityar?'\nYou notice they have scrawled some"
+                    " form of art using only the characters from a printing press on the wall."]
     if player_profile.human:
-        print("\n You enter the room and see a person chained to the wall murmuring something to themselves. As you get"
-              f" closer you hear what they are saying:\n{r.choice(crazy_people)}")
+        if generate_room_rng_number(room_info) == r.randint(0, generate_room_based_rng_number(rooms)):
+            # Wanted to use AI for this because I thought it would be funny, but the AI writing was really bad
+            print("\nYou enter the room and see a small pill on a pedestal. As you walk up to it, you feel compelled to"
+                  " take it. Before you can even think, you have swallowed the pill. You suddenly feel,\n djogyrf?"
+                  " *INSERT CODED DESCRIPTION OF DRUG TRIP HERE*. Rbrmyisaau upi nasvl piy. \n\nWhen you come to,"
+                  " everything feels as if it has slid back into place. You groggily get to your feet and try once more"
+                  " to continue on.")
+        else:
+            print("\n You enter the room and see a person chained to the wall murmuring something to themselves. As you"
+                  f" get closer you hear what they are saying:\n{r.choice(crazy_people)}")
         display_players_in_room(room_info)
 
 
@@ -321,12 +334,15 @@ def wise_old_man(room_info: v.Room, player_profile: v.Player, rooms: list, playe
     """Houses an old man who tries to give advice"""
     put_player_in_room(player_profile, room_info, rooms)
     # Make sure that there is never more joke wisdoms than there is real wisdoms
+    # Joke to real ratio: 2/5
     old_man_wisdoms = ["'The best way to not get lost is to make your own map.'",
                        "'My child, have you tried crossing the streams?'",
                        "'It's dangerous to go alone! Take this.'\n The old man does not give you anything, but you feel"
                        " sharper",
                        "'The shop holds the means to progress'",
-                       "'The last path is often the best'"]
+                       "'The last path is often the best'",
+                       "'There is no shame in taking the path of less resistance in the name of fun'",
+                       "'While the items sold in the shop are powerful, they are all flawed'"]
     if player_profile.human:
         print(
             "\nYou enter the room and see an old man sitting in the middle of it with a sign around his neck that says"
@@ -621,8 +637,21 @@ def recall(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
         sent_home = False
     if player_profile.human:
         if sent_home:
-            print("\nYou enter a large empty room. Wait, never mind it has a hole in the roof.\nDid it always have a"
-                  " hole in the roof?")
+            if generate_room_rng_number(room_info) == r.randint(0, generate_room_based_rng_number(rooms)):
+                players.remove(player_profile)
+                rooms[0].occupants.remove(player_profile.name)
+                print("\nYou enter a large empty room. You then realize that this room has a hole in it. You did not"
+                      " think you where near your start location. As you are trying to work out where you got turned"
+                      " around, you slowly get filled with a desire to return to your home. What are you doing here?"
+                      " Putting your neck on the line just to find some silly trinket for the king? You stop thinking"
+                      " about where you are and where you where and decide that all you really want to do is go"
+                      " home. As you begin to start thinking about how to get out, you realize that there is a ladder"
+                      " leading out the hole. You were sure that ladder was not there just a moment ago, but you don't"
+                      " care anymore. Your going home. You climb the ladder and begin the trek home, vowing to never"
+                      " think of the preceding events ever again.")
+            else:
+                print("\nYou enter a large empty room. Wait, never mind it has a hole in the roof.\nDid it always have"
+                      " a hole in the roof?")
         else:
             print("\nYou enter a large empty room. It reminds you of home.")
             display_players_in_room(room_info)
