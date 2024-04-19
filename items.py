@@ -35,12 +35,13 @@ your code for when AI using items is added."""
 
 import random as r
 import math as m
+from time import sleep
 
 import global_vars as v
 
 
 # Helper Functions
-def check_if_used(usable: bool, player_human: bool) -> bool:
+def check_if_used(usable: bool, player_human=True) -> bool:
     """Asks the player if they want to use the item and returns the response as a bool"""
     if not usable:  # Simplifies in-function logic
         return False
@@ -125,28 +126,27 @@ def match(usable: bool, player: v.Player, players=None, current_room=None, rooms
     """Identifies the rooms next to the room of the player who activated it"""
     if player.human:
         print("Match\n  A small match. Should create enough light to see into a room down a hallway.")
-    if check_if_used(usable, player.human):
+    if check_if_used(usable):
         player.inventory.remove(match)
-        if player.human:
-            print("\nYou strike the match and quickly look down the hallways of this room before it goes out.")
-            for direction in current_room.paths:
-                connected_room_x = current_room.x + v.Directions[direction].value[0]
-                connected_room_y = current_room.y + v.Directions[direction].value[1]
-                for room in rooms:
-                    if room.x == connected_room_x and room.y == connected_room_y:
-                        connected_room = room
-                        break
-                if connected_room.style in v.SPECIAL_ROOMS:
-                    article = "the "
+        print("\nYou strike the match and quickly look down the hallways of this room before it goes out.")
+        for direction in current_room.paths:
+            connected_room_x = current_room.x + v.Directions[direction].value[0]
+            connected_room_y = current_room.y + v.Directions[direction].value[1]
+            for room in rooms:
+                if room.x == connected_room_x and room.y == connected_room_y:
+                    connected_room = room
+                    break
+            if connected_room.style in v.SPECIAL_ROOMS:
+                article = "the "
+            else:
+                if connected_room.style.__name__[0] == "a":
+                    article = "an "
                 else:
-                    if connected_room.style.__name__[0] == "a":
-                        article = "an "
-                    else:
-                        article = "a "
-                print(f"When you look down the {direction.lower()} hallway, you can just make out the room at the other"
-                      f" end. The room appears to be {article + connected_room.style.__name__.replace('_', ' ')} room.")
-            print("Almost as soon as your done looking down all the halls, the match fizzles out. It looks like it"
-                  " won't light again, so you toss it aside.")
+                    article = "a "
+            print(f"When you look down the {direction.lower()} hallway, you can just make out the room at the other"
+                  f" end. The room appears to be {article + connected_room.style.__name__.replace('_', ' ')} room.")
+        print("Almost as soon as your done looking down all the halls, the match fizzles out. It looks like it"
+              " won't light again, so you toss it aside.")
 
 
 def swapper_remote(usable: bool, player: v.Player, players=None, room=None, rooms=None):
@@ -327,9 +327,9 @@ def compass(usable: bool, player: v.Player, players=None, room=None, rooms=None)
     direction_names = ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"]
     if player.human:
         print("Compass\n  A simple compass. On the back is a label stating that it points to what one desires most.")
-    if check_if_used(usable, player.human):  # Warning! Math ahead!
+    if check_if_used(usable):  # Warning! Math ahead!
         # Makes the compass not perfect in line with the lore of it pointing to what you desire most
-        target_room = rooms[-1] if r.randint(0, len(rooms)) != 0 else r.choice(rooms)
+        target_room = rooms[-1] if r.randint(0, int(len(rooms)/3)) != 0 else r.choice(rooms)
         x_distance = target_room.x - room.x
         y_distance = target_room.y - room.y
         x_sign = m.copysign(1, x_distance)
@@ -342,12 +342,11 @@ def compass(usable: bool, player: v.Player, players=None, room=None, rooms=None)
         current_room_to_goal_angle = m.degrees(m.atan(abs(x_distance) / abs(y_distance))) + supplemental_angle
         # This line stolen from StackOverflow
         current_room_to_goal_angle_compass_name = direction_names[(round(round(current_room_to_goal_angle) / 45)) % 8]
-        if player.human:
-            # Add art of the compass pointing that direction later
-            print("\nYou pull out your compass, making sure that all you desire is to find the room with the object in"
-                  " it. After focusing on your 'desire' for what feels long enough you take a look at where it is"
-                  f" pointing. The compass points to the {current_room_to_goal_angle_compass_name}. Satisfied, you put"
-                  " the compass back in you pack for now.")
+        # Add art of the compass pointing that direction later
+        print("\nYou pull out your compass, making sure that all you desire is to find the room with the object in"
+              " it. After focusing on your 'desire' for what feels long enough you take a look at where it is"
+              f" pointing. The compass points to the {current_room_to_goal_angle_compass_name}. Satisfied, you put"
+              " the compass back in you pack for now.")
 
 
 def pet_goblin(usable: bool, player: v.Player, players=None, room=None, rooms=None):
@@ -361,3 +360,88 @@ def pet_goblin(usable: bool, player: v.Player, players=None, room=None, rooms=No
             print("\nYou take the small goblin out of your pack and set it softly on the ground. It quickly turns"
                   " around, gives you a salute, and then wildly scampers off into some decrepit corner of the room so"
                   " that you can no longer see it. You hope this was worth it.")
+
+
+def magic_map(usable: bool, player: v.Player, players=None, current_room=None, rooms=None):
+    """Displays the last couple rooms the player has been in"""
+    if player.human:
+        print("Magic Map\n  A parchment that singes with magic. You feel it probing your memories and get the feeling"
+              " it might be able to show you where you have been.")
+    if check_if_used(usable):
+        print("You pull the parchment out of your pack. You stare at it a moment before you realize you might have to"
+              " say something to activate it. You quietly murmur some thinking sounds to yourself when suddenly that"
+              " gentle probing becomes blindingly powerful and you fall to your knees. Soon the feeling fades and you"
+              " get back on your feet. When you look back down at the parchment, you can see that it now shows a map.")
+
+        rooms_to_display = player.visited_rooms.copy()
+        while len(player.visited_rooms) > len(rooms)/3:  # Displays only most recently visited rooms
+            rooms_to_display.pop(0)
+        # Make sure the min and max values correspond to a room
+        max_x = rooms_to_display[0]
+        min_x = rooms_to_display[0]
+        max_y = rooms_to_display[0]
+        min_y = rooms_to_display[0]
+        for room in rooms_to_display:
+            if room.x > max_x:
+                max_x = room.x
+            if room.x < min_x:
+                min_x = room.x
+            if room.y > max_y:
+                max_y = room.y
+            if room.y < min_y:
+                min_y = room.y
+        empty_row = []
+        for _ in range((max_x - min_x) + 1):
+            empty_row.append(None)
+        location_relative_room_grid = []
+        for _ in range((max_y - min_y) + 1):
+            location_relative_room_grid.append(empty_row.copy())
+
+        # I don't really know how this translation code works
+        # It was also made assuming a room at (0, 0) and I don't know if it breaks if that's not true
+        for room in rooms_to_display:
+            translated_x = room.x + abs(min_x)
+            translated_y = max_y - room.y
+            location_relative_room_grid[translated_y][translated_x] = room
+
+        for row in location_relative_room_grid:
+            printed_room_row = ["", "", "", "", ""]
+            for room in row:
+                if room is None:
+                    for text_row_number in range(len(printed_room_row)):
+                        printed_room_row[text_row_number] += "     "
+                else:
+                    if player.name in room.occupants:
+                        room_category = "C"
+                    elif room.style in v.GOOD_ROOMS:
+                        room_category = "G"
+                    elif room.style in v.BAD_ROOMS:
+                        room_category = "B"
+                    elif room.style in v.SPECIAL_ROOMS:
+                        room_category = "S"
+                    else:
+                        room_category = "O"
+                    printed_room_row[1] += " ┌─┐ "
+                    printed_room_row[3] += " └─┘ "
+                    if "NORTH" in room.paths:
+                        printed_room_row[0] += "  ▲  "
+                    else:
+                        printed_room_row[0] += "     "
+                    if "SOUTH" in room.paths:
+                        printed_room_row[4] += "  ▼  "
+                    else:
+                        printed_room_row[4] += "     "
+                    if "WEST" in room.paths:
+                        printed_room_row[2] += f"◄│{room_category}│"
+                    else:
+                        printed_room_row[2] += f" │{room_category}│"
+                    if "EAST" in room.paths:
+                        printed_room_row[2] += "►"
+                    else:
+                        printed_room_row[2] += " "
+            for text_row in printed_room_row:
+                print(text_row)
+
+            sleep(5)
+            print("After spending some time getting your bearings with the map, you decide to put it pack in your"
+                  " pack.")

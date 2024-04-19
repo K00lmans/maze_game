@@ -85,3 +85,5 @@ def init():
     SPECIAL_ROOMS = [rm.pit, rm.combat, rm.swapper_control, rm.psycho, rm.wise_old_man]
     global ITEMS
     ITEMS = [i.match, i.swapper_remote, i.trap, i.gold_potion, i.dagger, i.nope_picture, i.compass]
+    global HUMAN_ONLY_ITEMS
+    HUMAN_ONLY_ITEMS = [i.match, i.compass]  # Items the AI can't use
