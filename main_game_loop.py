@@ -110,7 +110,7 @@ def generate_maze_layout(room_count: int) -> list:
             # Make sure the player is updated every second or so on generation progress
             if (time() - time_of_last_player_update) >= 1:  # Done only when a room is added to keep run speed up
                 if __name__ == "__main__":  # Prevents excess printing when testing
-                    print(f"\nRoom generation {int(100 - ((room_count/starting_room_count) * 100))}% done.")
+                    print(f"\nRoom generation {int(100 - ((room_count / starting_room_count) * 100))}% done.")
                     time_of_last_player_update = time()
     if __name__ == "__main__":  # Prevents excess printing when testing
         print("\nRoom layout generated...")
@@ -119,14 +119,22 @@ def generate_maze_layout(room_count: int) -> list:
 
 def generate_players(human_players: int, total_players: int, starter_gold: int) -> list:
     generated_players = []
+    difficulty_modifiers = [-1, 0, 1]
+    human_difficulties = []
     for player in range(total_players):
         if human_players > 0:
-            generated_players.append(
-                v.Player(True, input(f"\nPlayer {player + 1}, what would you like to name your character?\n"),
-                       starter_gold))
+            player_name = input(f"\nPlayer {player + 1}, what would you like to name your character?\n")
+            accepted_values = ["0", "1", "2"]
+            answer = None
+            while answer not in accepted_values:
+                answer = input(f"Player {player + 1}, select your difficulty:\n0: Easy\n1: Normal\n2: Hard\n")
+            chosen_difficulty = difficulty_modifiers[int(answer)]
+            human_difficulties.append(chosen_difficulty)
+            generated_players.append(v.Player(True, player_name, starter_gold, chosen_difficulty))
             human_players -= 1
         else:
-            generated_players.append(v.Player(False, r.choice(NPC_NAME_LIST), starter_gold))
+            generated_players.append(v.Player(False, r.choice(NPC_NAME_LIST), starter_gold,
+                                              round(sum(human_difficulties)/len(human_difficulties))))
     return generated_players
 
 
