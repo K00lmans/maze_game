@@ -134,7 +134,7 @@ def generate_players(human_players: int, total_players: int, starter_gold: int) 
             human_players -= 1
         else:
             generated_players.append(v.Player(False, r.choice(NPC_NAME_LIST), starter_gold,
-                                              round(sum(human_difficulties)/len(human_difficulties))))
+                                              -round(sum(human_difficulties)/len(human_difficulties))))
     return generated_players
 
 
