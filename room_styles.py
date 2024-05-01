@@ -100,7 +100,7 @@ def put_player_in_room(player: v.Player, entered_room: v.Room, rooms: list):
 
 
 def in_pit(player_profile: v.Player):
-    if r.randint(1, 4) == 1:
+    if r.randint(1, 4 + player_profile.difficulty) == 1:
         player_profile.state[1] = True
     if player_profile.human:
         if player_profile.state[1]:
@@ -167,14 +167,14 @@ def goal(room_info: v.Room, player_profile: v.Player, rooms: list, players: list
 def shop(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """A place to buy items"""
     put_player_in_room(player_profile, room_info, rooms)
-    shop_selection = r.sample(v.ITEMS, r.randint(3, len(v.ITEMS)))
+    shop_selection = r.sample(v.ITEMS, r.randint(3, len(v.ITEMS) - (1 + player_profile.difficulty)))
     if player_profile.human:  # Still needs way for AI to buy stuff
         print("\nYou enter the room and see that a small storefront has been set up.")
         display_players_in_room(room_info)
         print("\nAs you walk up to the shopkeeper, he hands you a small piece of paper that lists all of the items he"
-              f" has in stock and tells you that all items cost {len(players)//2} gold. The shopkeep tells you he will"
-              " is more than willing to show you any items you are interested in.")
-        if player_profile.gold >= (len(players)//2):
+              f" has in stock and tells you that all items cost {len(players)//(2 - player_profile.difficulty)} gold."
+              f" The shopkeep tells you he will is more than willing to show you any items you are interested in.")
+        if player_profile.gold >= (len(players)//(2 - player_profile.difficulty)):
             print("You decide to take a look at what he has.\n")
             in_shop = True
             while in_shop:
@@ -191,11 +191,11 @@ def shop(room_info: v.Room, player_profile: v.Player, rooms: list, players: list
                             purchase = input("Would you like to buy this item? (Y/N)\n").lower()
                         if purchase == "y":
                             player_profile.inventory.append(shop_selection[selection - 1])
-                            player_profile.gold -= len(players)/2
+                            player_profile.gold -= len(players)/(2 - player_profile.difficulty)
                             print(f"\nYou hand over the gold and the shopkeep hands you the"
                                   f" {shop_selection[selection - 1].__name__}. You put it in your pack for safe"
                                   " keeping.")
-                            if player_profile.gold < (len(players)/2):
+                            if player_profile.gold < (len(players)/(2 - player_profile.difficulty)):
                                 in_shop = False
                                 print("As you put your new purchase in your pack, you realize that you no longer have"
                                       " enough gold to make another purchase. You thank the shopkeep, hand back the"
@@ -240,9 +240,9 @@ def combat(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
         display_players_in_room(room_info)
     if player_profile.state[0] != in_combat:
         # Min health is min hits plus one to prevent insta-kills
-        enemy_health = r.randint(3, 20)
+        enemy_health = r.randint(3 + player_profile.difficulty, 10*(2 + player_profile.difficulty))
         # The state data indicates the enemy's health and the max damage the player can do per turn
-        player_profile.state = [in_combat, [enemy_health, (enemy_health // 2) + 1]]  # The two is the min hits to kill
+        player_profile.state = [in_combat, [enemy_health, (enemy_health//(2 + player_profile.difficulty)) + 1]]
 
 
 def swapper_control(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
@@ -353,35 +353,36 @@ def wise_old_man(room_info: v.Room, player_profile: v.Player, rooms: list, playe
 
 # Good room styles
 def small_treasure(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
-    """Gives 2 gold"""
+    """Gives 2-ish gold"""
     put_player_in_room(player_profile, room_info, rooms)
-    player_profile.gold += 2
+    player_profile.gold += 2 - player_profile.difficulty
     if player_profile.human:
         print("\nYou enter the room and see a large treasure chest overflowing with golden coins. On top of the chest"
-              " is a sign that says 'Please take only two'. Since your a good person you do as the sign says.\n+2"
-              " Gold!")
+              f" is a sign that says 'Please take only {2 - player_profile.difficulty}'. Since your a good person you"
+              f" do as the sign says.\n+{2 - player_profile.difficulty} Gold!")
         display_players_in_room(room_info)
 
 
 def large_treasure(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
-    """Gives 3 Gold"""
+    """Gives 3-ish Gold"""
     put_player_in_room(player_profile, room_info, rooms)
-    player_profile.gold += 3
+    player_profile.gold += 3 - player_profile.difficulty
     if player_profile.human:
         print("\nYou enter the room and see a large pile of golden coins siting in the middle of the room. In front of"
-              " the pile is a sign saying 'Please take only 3'. Since your a good person you do as the sign says.\n"
-              "+3 Gold!")
+              f" the pile is a sign saying 'Please take only {3 - player_profile.difficulty}'. Since your a good person"
+              f" you do as the sign says.\n+{3 - player_profile.difficulty} Gold!")
         display_players_in_room(room_info)
 
 
 def huge_treasure(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
-    """Gives 5 Gold"""
+    """Gives 5-ish Gold"""
     put_player_in_room(player_profile, room_info, rooms)
-    player_profile.gold += 5
+    player_profile.gold += 5 - player_profile.difficulty
     if player_profile.human:
         print("\nYou enter the room and are overwhelmed by the sheer number of coins that have been crammed into the"
               " room. Once you come to your senses you see a small sign floating near the coins that says 'Please only"
-              " take 5'. Since your a good person you do as the sign says.\n+5 Gold!")
+              f" take {5 - player_profile.difficulty}'. Since your a good person you do as the sign says.\n+"
+              f"{5 - player_profile.difficulty} Gold!")
         display_players_in_room(room_info)
 
 
@@ -424,7 +425,7 @@ def pit_lever(room_info: v.Room, player_profile: v.Player, rooms: list, players:
     """Sends another player to the pit"""
     put_player_in_room(player_profile, room_info, rooms)
     if player_profile.human:
-        if r.randint(1, 3) != 1:  # Can fail to prevent suffering
+        if r.randint(1, 3 + player_profile.difficulty) != 1:  # Can fail to prevent suffering
             print("\nYou enter the room and notice that along one of the walls is a large row of levers, each with a"
                   " painting above them. You realize that each painting is of one of your fellow explorers (including"
                   " you) and that pulling a lever will send that person to the pit. You decide to take a further look"
@@ -456,7 +457,7 @@ def pit_lever(room_info: v.Room, player_profile: v.Player, rooms: list, players:
             display_players_in_room(room_info)
             lever_pulled = False
     else:
-        if r.randint(1, 3) != 1:  # Can fail to prevent suffering
+        if r.randint(1, 3 + player_profile.difficulty) != 1:  # Can fail to prevent suffering
             selected_player = r.choice(players)
             lever_pulled = True
             if selected_player.human:
@@ -516,7 +517,7 @@ def gold_vacuum(room_info: v.Room, player_profile: v.Player, rooms: list, player
         if selected_player.human:
             print(f"{player_profile} has stolen some gold from {selected_player.name}.")
 
-    coins_stolen = r.randint(1, len(players))
+    coins_stolen = r.randint(1, len(players) - player_profile.difficulty)
     selected_player.gold -= coins_stolen
     player_profile.gold += coins_stolen
 

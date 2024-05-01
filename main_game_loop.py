@@ -117,7 +117,7 @@ def generate_maze_layout(room_count: int) -> list:
     return generated_rooms
 
 
-def generate_players(human_players: int, total_players: int, starter_gold: int) -> list:
+def generate_players(human_players: int, total_players: int, starter_gold: float) -> list:
     generated_players = []
     difficulty_modifiers = [-1, 0, 1]
     human_difficulties = []
@@ -131,6 +131,11 @@ def generate_players(human_players: int, total_players: int, starter_gold: int) 
             chosen_difficulty = difficulty_modifiers[int(answer)]
             human_difficulties.append(chosen_difficulty)
             generated_players.append(v.Player(True, player_name, starter_gold, chosen_difficulty))
+            # Really wanted to include this in the Player __init__ function but that caused issues
+            if chosen_difficulty == -1:
+                generated_players[-1].inventory.append(i.compass, i.magic_map)
+            elif chosen_difficulty == 0:
+                generated_players[-1].inventory.append(r.choice([i.compass, i.magic_map]))
             human_players -= 1
         else:
             generated_players.append(v.Player(False, r.choice(NPC_NAME_LIST), starter_gold,
@@ -161,7 +166,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
 
     # Default game values
     total_player_count = 4 if (human_player_count % 5) != 0 else human_player_count
-    starting_gold = total_player_count  # Compensates for charity room style
+    starting_gold = float(total_player_count)  # Compensates for charity room style
     total_rooms = 50
     enabled_special_rooms = v.SPECIAL_ROOMS.copy()
     # Recommended ratios
@@ -178,7 +183,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                     f"{10 - human_player_count})\n"))
                 if not (3 <= total_player_count <= 10):
                     raise ValueError
-                starting_gold = int(
+                starting_gold = float(
                     input(f"\nHow much gold will each of you start with?\n(Default: {total_player_count})\n"))
                 total_rooms = int(input("\nHow many rooms do you want this maze to have?\n(Default: 50)\n"))
                 good_rooms = int(
