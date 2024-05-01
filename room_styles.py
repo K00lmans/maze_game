@@ -526,7 +526,7 @@ def teleport(room_info: v.Room, player_profile: v.Player, rooms: list, players: 
     """Teleports them to a random room"""
     put_player_in_room(player_profile, room_info, rooms)  # Prevents crashing
     room_info.occupants.remove(player_profile.name)
-    new_room = r.choice(rooms)
+    new_room = r.choice(rooms[:-1])  # Prevents teleporting to the goal room and getting trapped
     player_profile.x = new_room.x
     player_profile.y = new_room.y
     new_room.occupants.append(player_profile.name)
