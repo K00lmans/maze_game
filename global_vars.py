@@ -33,10 +33,11 @@ class Room:
 
 
 class Player:
-    def __init__(self, is_human, player_name, starting_coins):
+    def __init__(self, is_human, player_name, starting_coins, difficulty):
         self.human = is_human
         self.name = player_name
         self.gold = starting_coins
+        self.difficulty = difficulty
         self.x = 0
         self.y = 0
         self.state = ["default", None]  # First is the name of the state, second is a place for data about the state
