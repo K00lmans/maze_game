@@ -28,7 +28,7 @@ class Room:
         if len(self.placed_items) > 0:
             for item in self.placed_items:
                 item[0](entering_player, self, item)
-                sleep(.5)
+                sleep(2)
         self.style(self, entering_player, room_list, player_list)
 
 

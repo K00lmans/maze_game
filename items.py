@@ -382,10 +382,10 @@ def magic_map(usable: bool, player: v.Player, players=None, current_room=None, r
         while len(player.visited_rooms) > len(rooms)/(3 + player.difficulty):
             rooms_to_display.pop(0)
         # Make sure the min and max values correspond to a room
-        max_x = rooms_to_display[0]
-        min_x = rooms_to_display[0]
-        max_y = rooms_to_display[0]
-        min_y = rooms_to_display[0]
+        max_x = rooms_to_display[0].x
+        min_x = rooms_to_display[0].x
+        max_y = rooms_to_display[0].y
+        min_y = rooms_to_display[0].y
         for room in rooms_to_display:
             if room.x > max_x:
                 max_x = room.x
@@ -447,6 +447,5 @@ def magic_map(usable: bool, player: v.Player, players=None, current_room=None, r
             for text_row in printed_room_row:
                 print(text_row)
 
-            sleep(5)
-            print("After spending some time getting your bearings with the map, you decide to put it pack in your"
-                  " pack.")
+        sleep(5)
+        print("After spending some time getting your bearings with the map, you decide to put it pack in your pack.")
