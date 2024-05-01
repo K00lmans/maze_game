@@ -425,7 +425,7 @@ def pit_lever(room_info: v.Room, player_profile: v.Player, rooms: list, players:
     """Sends another player to the pit"""
     put_player_in_room(player_profile, room_info, rooms)
     if player_profile.human:
-        if r.randint(1, 3 + player_profile.difficulty) != 1:  # Can fail to prevent suffering
+        if r.randint(0, 2 - player_profile.difficulty) != 0:  # Can fail to prevent suffering
             print("\nYou enter the room and notice that along one of the walls is a large row of levers, each with a"
                   " painting above them. You realize that each painting is of one of your fellow explorers (including"
                   " you) and that pulling a lever will send that person to the pit. You decide to take a further look"
@@ -541,7 +541,7 @@ def teleport(room_info: v.Room, player_profile: v.Player, rooms: list, players: 
 def pit_slide(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """Sends them to the pit"""
     put_player_in_room(player_profile, room_info, rooms)
-    if r.randint(0, 1) == 1:  # Can fail for sanity
+    if r.randint(0, 2 - player_profile.difficulty) == 0:  # Can fail for sanity
         room_info.occupants.remove(player_profile.name)
         for room in rooms:
             if room.style == pit:
@@ -629,7 +629,7 @@ def magnet(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
 def recall(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """Sends them to the home square"""
     put_player_in_room(player_profile, room_info, rooms)
-    if r.randint(0, 1) == 1:  # Can fail for sanity
+    if r.randint(0, 2 - player_profile.difficulty) == 0:  # Can fail for sanity
         room_info.occupants.remove(player_profile.name)
         rooms[0].occupants.append(player_profile.name)
         player_profile.x, player_profile.y = 0, 0  # Room generation always starts at 0, 0 with the home room

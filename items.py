@@ -61,33 +61,35 @@ def check_if_used(usable: bool, player_human=True) -> bool:
 
 def trapped(player: v.Player, room: v.Room, placed_item: list):
     """Logic for placed trap"""
-    player.gold -= 2
-    placed_item[1].gold += 2
+    player.gold -= 2 + player.difficulty
+    placed_item[1].gold += 2 + player.difficulty
     if player.human:
         if player is placed_item[1]:
             print("\nYou walk into the room and get stuck in a trap. You realize that this is in fact your trap and"
                   " facepalm. Thankfully when you check your pockets you still have the same amount of gold you had"
                   " before and you breath a sigh of relief.")
         else:
-            print("\nYou walk into the room and get stuck in a trap. You hear a loud vacuum sound and see two gold"
-                  " coins get sucked from you pocket. After the coins fall deep into the trap you are released. You"
-                  " take a moment to inspect the trap to see if you can get your gold back. While you don't see any way"
-                  f" to get your gold back, you do notice a plaque that says 'Property of {placed_item[1].name}'.")
+            print("\nYou walk into the room and get stuck in a trap. You hear a loud vacuum sound and see"
+                  f" {2 + player.difficulty} gold coins get sucked from you pocket. After the coins fall deep into the"
+                  " trap you are released. You take a moment to inspect the trap to see if you can get your gold back."
+                  " While you don't see any way to get your gold back, you do notice a plaque that says 'Property of"
+                  f" {placed_item[1].name}'.")
     else:
         if placed_item[1].human:
-            print(f"\n{player.name} has been trapped in {placed_item[1].name}'s trap and had 2 gold stolen.")
+            print(f"\n{player.name} has been trapped in {placed_item[1].name}'s trap and had {2 + player.difficulty}"
+                  " gold stolen.")
 
 
 def potion_gold(player: v.Player, room: v.Room, placed_item: list):
     """Logic for placed gold potion"""
-    player.gold += 3
+    player.gold += 3 - player.difficulty
     room.placed_items.remove(placed_item)
     if player.human:
         print("\nAs you walk into the room you notice a golden potion sitting on the floor without a cap or cork. Your"
               " instincts take over and you drink it as quickly as possible to prevent violation of the 5 second rule."
               " Once you are done drinking you notice your pockets feel heavier and upon further investigation you"
-              " realize you have 3 extra gold for some reason. Neat! Upon further examination of the bottle you see a"
-              f" small label saying 'Property of {placed_item[1].name}'.")
+              f" realize you have {3 - player.difficulty} extra gold for some reason. Neat! Upon further examination of"
+              f" the bottle you see a small label saying 'Property of {placed_item[1].name}'.")
     else:
         if placed_item[1].human:
             print(f"{player.name} has found and drank {placed_item[1].name}'s potion.")
@@ -209,7 +211,7 @@ def swapper_remote(usable: bool, player: v.Player, players=None, room=None, room
 
 
 def trap(usable: bool, player: v.Player, players=None, room=None, rooms=None):
-    """Sets a trap in the room it's used in, steals two gold from each player who enters that room"""
+    """Sets a trap in the room it's used in, steals 2-ish gold from each player who enters that room"""
     if player.human:
         print("Trap\n  A small bear trap that has been modified to house a small teleportation device and a gold"
               " magnet.")
@@ -221,7 +223,7 @@ def trap(usable: bool, player: v.Player, players=None, room=None, rooms=None):
 
 
 def gold_potion(usable: bool, player: v.Player, players=None, room=None, rooms=None):
-    """Put's three gold in a random nearby room"""
+    """Put's 3-ish gold in a random nearby room"""
     if player.human:
         print("Gold Potion\n  A small golden potion. There is a label on the cork that warns that opening the potion"
               " may cause it to teleport.")
@@ -244,7 +246,7 @@ def gold_potion(usable: bool, player: v.Player, players=None, room=None, rooms=N
 
 
 def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
-    """Steal 4 gold from any player in the same room"""
+    """Steal 4-ish gold from any player in the same room"""
     # This whole thing needs a rewrite, make sure to do that when adding AI item use
     if player.human:
         print("Dagger\n  A sharp dagger. While you don't want to kill anyone, you sure could use this to extort some"
@@ -261,43 +263,45 @@ def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
                 if r.randint(0, 10 - len(other_players_in_room)) != 0:
                     for player_in_room in other_players_in_room:
                         player_in_room.gold -= 4
-                    player.gold += 4 * len(other_players_in_room)
+                    player.gold += (4 - player.difficulty) * len(other_players_in_room)
                     for player_number in range(len(other_players_in_room)):
                         other_players_in_room[player_number] = other_players_in_room[player_number].name
                     if len(other_players_in_room) == 1:
                         print(f"You pull out your dagger and point it at {other_players_in_room[0]} and you tell them"
-                              f" that if they don't give you 4 gold, you are going to stab them. They quickly scrounge"
-                              f" around in their pockets and then hand over 4 gold. You put the gold in your pockets"
-                              f" and then put your dagger away.")
+                              f" that if they don't give you {4 - player.difficulty} gold, you are going to stab them."
+                              f" They quickly scrounge around in their pockets and then hand over"
+                              f" {4 - player.difficulty} gold. You put the gold in your pockets and then put your"
+                              f" dagger away.")
                     else:
                         print(f"You pull out your dagger and wave it at {', '.join(other_players_in_room[:-1])}, and"
-                              f" {other_players_in_room[-1]}. You tell them that anyone who does not hand over 4 gold"
-                              f" is going to be stabbed. All of them quickly search through there pockets and toss the"
-                              f" 4 gold in your direction. You grab all of the gold off the floor while still holding"
-                              f" out your dagger, and only once all of the gold is safely in your pockets do you put"
-                              f" away the dagger.")
+                              f" {other_players_in_room[-1]}. You tell them that anyone who does not hand over"
+                              f" {4 - player.difficulty} gold is going to be stabbed. All of them quickly search"
+                              f" through there pockets and toss the {4 - player.difficulty} gold in your direction. You"
+                              f" grab all of the gold off the floor while still holding out your dagger, and only once"
+                              f" all of the gold is safely in your pockets do you put away the dagger.")
                 else:
                     player.inventory.remove(dagger)
                     if len(other_players_in_room) == 1:
                         print(f"You pull out your dagger and point it at {other_players_in_room[0]} and you tell them"
-                              f" that if they don't give you 4 gold, you are going to stab them. Before you can react,"
-                              f" they jump straight at you and tackle you to the ground. They pull the dagger out of"
-                              f" your hands, jump back up, and then smash the dagger against the floor, shattering it."
-                              f" You stare at them for a moment before deciding to pretend like nothing happened.")
+                              f" that if they don't give you {4 - player.difficulty} gold, you are going to stab them."
+                              f" Before you can react, they jump straight at you and tackle you to the ground. They"
+                              f" pull the dagger out of your hands, jump back up, and then smash the dagger against the"
+                              f" floor, shattering it. You stare at them for a moment before deciding to pretend like"
+                              f" nothing happened.")
                     else:
                         print(f"You pull out your dagger and wave it at {', '.join(other_players_in_room[:-1])}, and"
-                              f" {other_players_in_room[-1]}. You tell them that anyone who does not hand over 4 gold"
-                              f" is going to be stabbed. They all look at each other, nod, and then before you can"
-                              f" react, jump right at you and all dogpile you. You lose grip of the dagger and"
-                              f" {r.choice(other_players_in_room)} grabs it and jumps back up. As if on cue, everybody"
-                              f" else also slowly gets up. Once they are up, standing in front of you, they begin to"
-                              f" chant.\n\n'NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO"
-                              f" MORE'\n\nAs you stare in disbelief, the one who grabbed the dagger slowly raises it"
-                              f" above their head, and then suddenly and with surprising might, slam the dagger into"
-                              f" the ground, shattering it into a thousand pieces. As you stare in disbelief all the"
-                              f" others slacken their pose and begin politely talking amongst themselves like nothing"
-                              f" happened. You cautiously decide it might be best to follow their lead and go about"
-                              f" your businesses like nothing happened.")
+                              f" {other_players_in_room[-1]}. You tell them that anyone who does not hand over"
+                              f" {4 - player.difficulty} gold is going to be stabbed. They all look at each other, nod,"
+                              f" and then before you can react, jump right at you and all dogpile you. You lose grip of"
+                              f" the dagger and {r.choice(other_players_in_room)} grabs it and jumps back up. As if on"
+                              f" cue, everybody else also slowly gets up. Once they are up, standing in front of you,"
+                              f" they begin to chant.\n\n'NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO"
+                              f" MORE NO MORE NO MORE'\n\nAs you stare in disbelief, the one who grabbed the dagger"
+                              f" slowly raises it above their head, and then suddenly and with surprising might, slam"
+                              f" the dagger into the ground, shattering it into a thousand pieces. As you stare in"
+                              f" disbelief all the others slacken their pose and begin politely talking amongst"
+                              f" themselves like nothing happened. You cautiously decide it might be best to follow"
+                              f" their lead and go about your businesses like nothing happened.")
             else:
                 print("\nYou pull out your dagger, but realize that no one else is here.")
 
@@ -329,7 +333,7 @@ def compass(usable: bool, player: v.Player, players=None, room=None, rooms=None)
         print("Compass\n  A simple compass. On the back is a label stating that it points to what one desires most.")
     if check_if_used(usable):  # Warning! Math ahead!
         # Makes the compass not perfect in line with the lore of it pointing to what you desire most
-        target_room = rooms[-1] if r.randint(0, int(len(rooms)/3)) != 0 else r.choice(rooms)
+        target_room = rooms[-1] if r.randint(0, int(len(rooms)/(3 + player.difficulty))) != 0 else r.choice(rooms)
         x_distance = target_room.x - room.x
         y_distance = target_room.y - room.y
         x_sign = m.copysign(1, x_distance)
@@ -374,7 +378,8 @@ def magic_map(usable: bool, player: v.Player, players=None, current_room=None, r
               " get back on your feet. When you look back down at the parchment, you can see that it now shows a map.")
 
         rooms_to_display = player.visited_rooms.copy()
-        while len(player.visited_rooms) > len(rooms)/3:  # Displays only most recently visited rooms
+        # Displays only most recently visited rooms
+        while len(player.visited_rooms) > len(rooms)/(3 + player.difficulty):
             rooms_to_display.pop(0)
         # Make sure the min and max values correspond to a room
         max_x = rooms_to_display[0]
