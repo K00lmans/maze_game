@@ -133,7 +133,8 @@ def generate_players(human_players: int, total_players: int, starter_gold: float
             generated_players.append(v.Player(True, player_name, starter_gold, chosen_difficulty))
             # Really wanted to include this in the Player __init__ function but that caused issues
             if chosen_difficulty == -1:
-                generated_players[-1].inventory.append(i.compass, i.magic_map)
+                generated_players[-1].inventory.append(i.compass)
+                generated_players[-1].inventory.append(i.magic_map)
             elif chosen_difficulty == 0:
                 generated_players[-1].inventory.append(r.choice([i.compass, i.magic_map]))
             human_players -= 1
