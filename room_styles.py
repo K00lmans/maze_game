@@ -277,26 +277,21 @@ def swapper_control(room_info: v.Room, player_profile: v.Player, rooms: list, pl
             print(f"\n{player_profile.name} has swapped the locations of {selected_players[0].name} and"
                   f" {selected_players[1].name}.")
 
-    # If this code is cleaner, should be used to replace the swap code for the swapper_remote item
-    first_player_x_y = [selected_players[0].x, selected_players[0].y]
-    second_player_x_y = [selected_players[0].x, selected_players[0].y]
-    for player in selected_players:
-        for room in rooms:
-            if player.name in room.occupants:
-                room.occupants.remove(player.name)
-                break
-    selected_players[0].x = second_player_x_y[0]
-    selected_players[0].y = second_player_x_y[1]
-    selected_players[1].x = first_player_x_y[0]
-    selected_players[1].y = first_player_x_y[1]
-    for player in selected_players:
-        for room in rooms:
-            if player.x == room.x and player.y == room.y:
-                room.occupants.append(player.name)
-                break
-    # Prevents stuck spots from carrying over
-    selected_players[0].state = ["default", None]
-    selected_players[1].state = ["default", None]
+    swapped_players_rooms = [None, None]
+    for searched_room in rooms:
+        if selected_players[0].name in searched_room.occupants:
+            swapped_players_rooms[0] = searched_room
+        if selected_players[1].name in searched_room.occupants:
+            swapped_players_rooms[1] = searched_room
+    for swapped_player_number, swapped_player in enumerate(selected_players):
+        other_swapped_player_number = 1 if swapped_player_number == 0 else 0
+        swapped_players_rooms[swapped_player_number].occupants.remove(swapped_player.name)
+        swapped_players_rooms[other_swapped_player_number].occupants.append(swapped_player.name)
+        if swapped_players_rooms[other_swapped_player_number] not in swapped_player.visited_rooms:
+            swapped_player.visited_rooms.append(swapped_players_rooms[other_swapped_player_number])
+        swapped_player.x = swapped_players_rooms[other_swapped_player_number].x
+        swapped_player.y = swapped_players_rooms[other_swapped_player_number].y
+        swapped_player.state = ["default", None]
 
 
 def psycho(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
@@ -477,6 +472,8 @@ def pit_lever(room_info: v.Room, player_profile: v.Player, rooms: list, players:
         selected_player.x = pit_room.x
         selected_player.y = pit_room.y
         selected_player.state = [in_pit, False]
+        if pit_room not in selected_player.visited_rooms:
+            selected_player.visited_rooms.append(pit_room)
         pit_room.occupants.append(selected_player.name)
 
 
@@ -530,6 +527,8 @@ def teleport(room_info: v.Room, player_profile: v.Player, rooms: list, players: 
     new_room = r.choice(rooms[:-1])  # Prevents teleporting to the goal room and getting trapped
     player_profile.x = new_room.x
     player_profile.y = new_room.y
+    if new_room not in player_profile.visited_rooms:
+        player_profile.visited_rooms.append(new_room)
     new_room.occupants.append(player_profile.name)
 
     if player_profile.human:
@@ -550,6 +549,8 @@ def pit_slide(room_info: v.Room, player_profile: v.Player, rooms: list, players:
         player_profile.x = pit_room.x
         player_profile.y = pit_room.y
         player_profile.state = [in_pit, False]
+        if pit_room not in player_profile.visited_rooms:
+            player_profile.visited_rooms.append(pit_room)
         pit_room.occupants.append(player_profile.name)
         used_slide = True
     else:
@@ -579,8 +580,12 @@ def swapper(room_info: v.Room, player_profile: v.Player, rooms: list, players: l
                 break
         new_room.occupants.append(player_profile.name)
         player_profile.x, player_profile.y = new_room.x, new_room.y
+        if new_room not in player_profile.visited_rooms:
+            player_profile.visited_rooms.append(new_room)
         room_info.occupants.append(swapped_player.name)
         swapped_player.x, swapped_player.y = room_info.x, room_info.y
+        if room_info not in swapped_player.visited_rooms:
+            swapped_player.visited_rooms.append(room_info)
         swapped_player.state = ["default", None]  # Prevents stuck spot from carrying over
 
     if player_profile.human:
