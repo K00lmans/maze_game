@@ -343,7 +343,10 @@ def compass(usable: bool, player: v.Player, players=None, room=None, rooms=None)
             supplemental_angle += 180
         if x_sign != y_sign:
             supplemental_angle += 90
-        current_room_to_goal_angle = m.degrees(m.atan(abs(x_distance) / abs(y_distance))) + supplemental_angle
+        try:
+            current_room_to_goal_angle = m.degrees(m.atan(abs(x_distance) / abs(y_distance))) + supplemental_angle
+        except ZeroDivisionError:
+            current_room_to_goal_angle = supplemental_angle
         # This line stolen from StackOverflow
         current_room_to_goal_angle_compass_name = direction_names[(round(round(current_room_to_goal_angle) / 45)) % 8]
         # Add art of the compass pointing that direction later

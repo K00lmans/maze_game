@@ -251,6 +251,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
           " hunt begins.")
     for player in players:  # Puts all the players in the starting room
         rooms[0].occupants.append(player.name)
+        player.visited_rooms.append(rooms[0])
     winner = False
     while not winner:
         for player_number, player in enumerate(players):
