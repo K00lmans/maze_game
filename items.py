@@ -247,7 +247,7 @@ def gold_potion(usable: bool, player: v.Player, players=None, room=None, rooms=N
 
 def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
     """Steal 4-ish gold from any player in the same room"""
-    # This whole thing needs a rewrite, make sure to do that when adding AI item use
+    # This whole thing is so bad and needs a rewrite, make sure to do that when adding AI item use
     if player.human:
         print("Dagger\n  A sharp dagger. While you don't want to kill anyone, you sure could use this to extort some"
               " people.")
@@ -264,6 +264,7 @@ def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
                     for player_in_room in other_players_in_room:
                         player_in_room.gold -= 4 - player.difficulty
                     player.gold += (4 - player.difficulty) * len(other_players_in_room)
+                    # Because I forgot how my own data types work
                     for player_number in range(len(other_players_in_room)):
                         other_players_in_room[player_number] = other_players_in_room[player_number].name
                     if len(other_players_in_room) == 1:
@@ -280,6 +281,9 @@ def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
                               f" grab all of the gold off the floor while still holding out your dagger, and only once"
                               f" all of the gold is safely in your pockets do you put away the dagger.")
                 else:
+                    # And this is why you remember how your own data types work before you code a thing
+                    for player_number in range(len(other_players_in_room)):
+                        other_players_in_room[player_number] = other_players_in_room[player_number].name
                     player.inventory.remove(dagger)
                     if len(other_players_in_room) == 1:
                         print(f"You pull out your dagger and point it at {other_players_in_room[0]} and you tell them"
