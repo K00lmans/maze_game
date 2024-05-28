@@ -262,7 +262,7 @@ def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
                 # The more people in the room, the more likely to fail
                 if r.randint(0, 10 - len(other_players_in_room)) != 0:
                     for player_in_room in other_players_in_room:
-                        player_in_room.gold -= 4
+                        player_in_room.gold -= 4 - player.difficulty
                     player.gold += (4 - player.difficulty) * len(other_players_in_room)
                     for player_number in range(len(other_players_in_room)):
                         other_players_in_room[player_number] = other_players_in_room[player_number].name

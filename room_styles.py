@@ -191,11 +191,11 @@ def shop(room_info: v.Room, player_profile: v.Player, rooms: list, players: list
                             purchase = input("Would you like to buy this item? (Y/N)\n").lower()
                         if purchase == "y":
                             player_profile.inventory.append(shop_selection[selection - 1])
-                            player_profile.gold -= len(players)/(2 - player_profile.difficulty)
+                            player_profile.gold -= len(players)//(2 - player_profile.difficulty)
                             print(f"\nYou hand over the gold and the shopkeep hands you the"
                                   f" {shop_selection[selection - 1].__name__}. You put it in your pack for safe"
                                   " keeping.")
-                            if player_profile.gold < (len(players)/(2 - player_profile.difficulty)):
+                            if player_profile.gold < (len(players)//(2 - player_profile.difficulty)):
                                 in_shop = False
                                 print("As you put your new purchase in your pack, you realize that you no longer have"
                                       " enough gold to make another purchase. You thank the shopkeep, hand back the"
