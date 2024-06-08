@@ -138,7 +138,7 @@ def match(usable: bool, player: v.Player, players=None, current_room=None, rooms
                 if room.x == connected_room_x and room.y == connected_room_y:
                     connected_room = room
                     break
-            if connected_room.style in v.SPECIAL_ROOMS:
+            if connected_room.style in list(v.ROOMS["special_rooms"].values()):
                 article = "the "
             else:
                 if connected_room.style.__name__[0] == "a":
@@ -426,12 +426,20 @@ def magic_map(usable: bool, player: v.Player, players=None, current_room=None, r
                 else:
                     if player.name in room.occupants:
                         room_category = "C"
-                    elif room.style in v.GOOD_ROOMS:
+                    elif room.style in list(v.ROOMS["good_rooms"].values()):
                         room_category = "G"
-                    elif room.style in v.BAD_ROOMS:
+                    elif room.style in list(v.ROOMS["bad_rooms"].values()):
                         room_category = "B"
-                    elif room.style in v.SPECIAL_ROOMS:
+                    elif room.style in list(v.ROOMS["special_rooms"].values()):
                         room_category = "S"
+                    elif room.style == v.ROOMS["other_rooms"]["start"]:
+                        room_category = "⌂"
+                    elif room.style == v.ROOMS["other_rooms"]["empty"]:
+                        room_category = "E"
+                    elif room.style == v.ROOMS["other_rooms"]["goal"]:
+                        room_category = "G"
+                    elif room.style == v.ROOMS["other_rooms"]["shop"]:
+                        room_category = "$"
                     else:
                         room_category = "U"
                     printed_room_row[1] += " ┌─┐ "
