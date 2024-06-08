@@ -75,16 +75,73 @@ class Player:
 
 
 def init():
-    import items as i
     import room_styles as rm
-    global GOOD_ROOMS
-    GOOD_ROOMS = GOOD_ROOMS = [rm.small_treasure, rm.large_treasure, rm.huge_treasure, rm.gold_machine,
-                               rm.match_machine, rm.pit_lever, rm.gold_vacuum]
-    global BAD_ROOMS
-    BAD_ROOMS = [rm.teleport, rm.pit_slide, rm.swapper, rm.magnet, rm.recall, rm.charity, rm.pickpocket]
-    global SPECIAL_ROOMS
-    SPECIAL_ROOMS = [rm.pit, rm.combat, rm.swapper_control, rm.psycho, rm.wise_old_man]
+    import items as i
+    good_rooms = {
+        "small_treasure": rm.small_treasure,
+        "large_treasure": rm.large_treasure,
+        "gold_machine": rm.gold_machine,
+        "match_machine": rm.match_machine,
+        "pit_lever": rm.pit_lever,
+        "gold_vacuum": rm.gold_vacuum
+    }
+    bad_rooms = {
+        "teleport": rm.teleport,
+        "pit_slide": rm.pit_slide,
+        "swapper": rm.swapper,
+        "magnet": rm.magnet,
+        "recall": rm.recall,
+        "charity": rm.charity,
+        "pickpocket": rm.pickpocket
+    }
+    special_rooms = {
+        "pit": rm.pit,
+        "combat": rm.combat,
+        "swapper_control": rm.swapper_control,
+        "psycho": rm.psycho,
+        "wise_old_man": rm.wise_old_man
+    }
+    other_rooms = {
+        "start": rm.start,
+        "empty": rm.empty,
+        "goal": rm.goal,
+        "shop": rm.shop
+    }
+    global ROOMS
+    ROOMS = {
+        "good_rooms": good_rooms,
+        "bad_rooms": bad_rooms,
+        "special_rooms": special_rooms,
+        "other_rooms": other_rooms
+    }
+    global ROOM_HELPER_FUNCTIONS
+    ROOM_HELPER_FUNCTIONS = {
+        "display_players_in_room": rm.display_players_in_room,
+        "generate_room_based_rng_number": rm.generate_room_based_rng_number,
+        "generate_room_rng_number": rm.generate_room_rng_number,
+        "put_player_in_room": rm.put_player_in_room,
+        "in_pit": rm.in_pit,
+        "in_combat": rm.in_combat
+    }
+
     global ITEMS
-    ITEMS = [i.match, i.swapper_remote, i.trap, i.gold_potion, i.dagger, i.nope_picture, i.compass, i.magic_map]
+    ITEMS = {
+        "match": i.match,
+        "swapper_remote": i.swapper_remote,
+        "trap": i.trap,
+        "gold_potion": i.gold_potion,
+        "dagger": i.dagger,
+        "nope_picture": i.nope_picture,
+        "compass": i.compass,
+        "magic_map": i.magic_map
+    }
+    global ITEM_HELPER_FUNCTIONS
+    ITEM_HELPER_FUNCTIONS = {
+        "check_if_used": i.check_if_used,
+        "trapped": i.trapped,
+        "potion_gold": i.potion_gold,
+        "encountered_goblin": i.encountered_goblin,
+        "move_goblin": i.move_goblin
+    }
     global HUMAN_ONLY_ITEMS
     HUMAN_ONLY_ITEMS = [i.match, i.compass, i.magic_map]  # Items the AI can't use

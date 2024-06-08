@@ -34,7 +34,6 @@ variable file."""
 import random as r
 
 import global_vars as v
-import items as i
 
 
 # Helper Functions
@@ -167,7 +166,7 @@ def goal(room_info: v.Room, player_profile: v.Player, rooms: list, players: list
 def shop(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """A place to buy items"""
     put_player_in_room(player_profile, room_info, rooms)
-    shop_selection = r.sample(v.ITEMS, r.randint(3, len(v.ITEMS) - (1 + player_profile.difficulty)))
+    shop_selection = r.sample(list(v.ITEMS.values()), r.randint(3, len(v.ITEMS) - (1 + player_profile.difficulty)))
     if player_profile.human:  # Still needs way for AI to buy stuff
         print("\nYou enter the room and see that a small storefront has been set up.")
         display_players_in_room(room_info)
@@ -407,7 +406,7 @@ def gold_machine(room_info: v.Room, player_profile: v.Player, rooms: list, playe
 def match_machine(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """Gives match"""
     put_player_in_room(player_profile, room_info, rooms)
-    player_profile.inventory.append(i.match)
+    player_profile.inventory.append(v.ITEMS["match"])
     if player_profile.human:
         print("\nYou enter the room and see a small machine sitting against the wall. As you get close to the machine"
               " you realize that it is full of matches. As you try to figure out how to get at one of the matches, a"

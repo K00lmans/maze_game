@@ -2,8 +2,6 @@ from time import sleep, time
 import random as r
 
 import global_vars as v
-import room_styles as rm
-import items as i
 
 v.init()  # Creates all the global variables for all the files to use
 
@@ -14,26 +12,26 @@ def assign_rooms(maze_layout: list, special_rooms: list, good_room_count: int, b
 
     for count, room_style in enumerate(special_rooms):
         chosen_room = r.choice(maze_layout)
-        while chosen_room.style != rm.empty:
+        while chosen_room.style != v.ROOMS["other_rooms"]["empty"]:
             chosen_room = r.choice(maze_layout)
         chosen_room.style = room_style
 
     while good_room_count != 0:
         chosen_room = r.choice(maze_layout)
-        if chosen_room.style == rm.empty:
-            chosen_room.style = r.choice(v.GOOD_ROOMS)
+        if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
+            chosen_room.style = r.choice(list(v.ROOMS["good_rooms"].values()))
             good_room_count -= 1
 
     while bad_room_count != 0:
         chosen_room = r.choice(maze_layout)
-        if chosen_room.style == rm.empty:
-            chosen_room.style = r.choice(v.BAD_ROOMS)
+        if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
+            chosen_room.style = r.choice(list(v.ROOMS["bad_rooms"].values()))
             bad_room_count -= 1
 
     while shop_count != 0:
         chosen_room = r.choice(maze_layout)
-        if chosen_room.style == rm.empty:
-            chosen_room.style = rm.shop
+        if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
+            chosen_room.style = v.ROOMS["other_rooms"]["shop"]
             shop_count -= 1
 
 
@@ -49,7 +47,7 @@ def generate_maze_layout(room_count: int) -> list:
     starting_room_count = room_count
     generated_rooms = []
     room_crawler = [0, 0]
-    generated_rooms.append(v.Room(rm.start, room_crawler[0], room_crawler[1]))
+    generated_rooms.append(v.Room(v.ROOMS["other_rooms"]["start"], room_crawler[0], room_crawler[1]))
 
     room_crawler_room = generated_rooms[0]  # Keeps track of the room the room crawler is at to reduce repeated searches
     max_x_y = [0, 0]
@@ -104,7 +102,9 @@ def generate_maze_layout(room_count: int) -> list:
                 room_crawler_room = room
                 break
         if new_room:
-            generated_rooms.append(v.Room(rm.empty if room_count != 0 else rm.goal, room_crawler[0], room_crawler[1]))
+            generated_rooms.append(
+                v.Room(v.ROOMS["other_rooms"]["empty"] if room_count != 0 else v.ROOMS["other_rooms"]["goal"],
+                       room_crawler[0], room_crawler[1]))
             room_crawler_room = generated_rooms[-1]
             room_count -= 1
             # Make sure the player is updated every second or so on generation progress
@@ -133,22 +133,22 @@ def generate_players(human_players: int, total_players: int, starter_gold: float
             generated_players.append(v.Player(True, player_name, starter_gold, chosen_difficulty))
             # Really wanted to include this in the Player __init__ function but that caused issues
             if chosen_difficulty == -1:
-                generated_players[-1].inventory.append(i.compass)
-                generated_players[-1].inventory.append(i.magic_map)
+                generated_players[-1].inventory.append(v.ITEMS["compass"])
+                generated_players[-1].inventory.append(v.ITEMS["magic_map"])
             elif chosen_difficulty == 0:
-                generated_players[-1].inventory.append(r.choice([i.compass, i.magic_map]))
+                generated_players[-1].inventory.append(r.choice([v.ITEMS["compass"], v.ITEMS["magic_map"]]))
             human_players -= 1
         else:
             generated_players.append(v.Player(False, r.choice(NPC_NAME_LIST), starter_gold,
-                                              -round(sum(human_difficulties)/len(human_difficulties))))
+                                              -round(sum(human_difficulties) / len(human_difficulties))))
     return generated_players
 
 
 if __name__ == "__main__":  # Allows for testing of this file's functions, also just good practice
     try:
-        file = open("npc_names.txt", "r")
+        file = open("npc_names.txt", "r", encoding='utf-8')
     except FileNotFoundError:  # Allows this code to be run complied
-        file = open("_internal\\npc_names.txt", "r")
+        file = open("_internal\\npc_names.txt", "r", encoding='utf-8')
     NPC_NAME_LIST = file.read().split('\n')  # Stolen from StackOverflow
     file.close()
 
@@ -169,7 +169,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
     total_player_count = 4 if (human_player_count % 5) != 0 else human_player_count
     starting_gold = float(total_player_count)  # Compensates for charity room style
     total_rooms = 50
-    enabled_special_rooms = v.SPECIAL_ROOMS.copy()
+    enabled_special_rooms = list(v.ROOMS["special_rooms"].values())
     # Recommended ratios
     good_rooms = total_rooms // 8
     bad_rooms = total_rooms // 8
@@ -199,7 +199,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                 while modifying_special_rooms:
                     print(
                         "\nEnabled special rooms\n(Disabled rooms never show up but enabled ones are not guaranteed!)")
-                    for special_room_count, special_room in enumerate(v.SPECIAL_ROOMS):
+                    for special_room_count, special_room in enumerate(list(v.ROOMS["special_rooms"].values())):
                         if special_room in enabled_special_rooms:
                             print(
                                 f"{special_room_count}: "
@@ -209,14 +209,15 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                                 f"{special_room_count}: "
                                 f"{special_room.__name__.replace('_', ' ').capitalize()} room, Disabled!")
                     selected_room = int(input(
-                        f"Enter a rooms number to toggle it and {len(v.SPECIAL_ROOMS)} to submit room selection\n"))
-                    if selected_room == len(v.SPECIAL_ROOMS):
+                        f"Enter a rooms number to toggle it and {len(v.ROOMS['special_rooms'])} to submit room "
+                        f"selection\n"))
+                    if selected_room == len(v.ROOMS["special_rooms"]):
                         modifying_special_rooms = False
                     else:
-                        if v.SPECIAL_ROOMS[selected_room] in enabled_special_rooms:
-                            enabled_special_rooms.remove(v.SPECIAL_ROOMS[selected_room])
+                        if list(v.ROOMS["special_rooms"].values())[selected_room] in enabled_special_rooms:
+                            enabled_special_rooms.remove(list(v.ROOMS["special_rooms"].values())[selected_room])
                         else:
-                            enabled_special_rooms.append(v.SPECIAL_ROOMS[selected_room])
+                            enabled_special_rooms.append(list(v.ROOMS["special_rooms"].values())[selected_room])
                 customizing_settings = False
             except ValueError:
                 print("Inappropriate value")
@@ -230,9 +231,9 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
     except ValueError:
         pass
     # Removes rooms related to a special room if the special room is not enabled
-    if rm.pit not in enabled_special_rooms:
-        v.GOOD_ROOMS.remove(rm.pit_lever)
-        v.BAD_ROOMS.remove(rm.pit_slide)
+    if v.ROOMS["special_rooms"]["pit"] not in enabled_special_rooms:
+        v.ROOMS["good_rooms"].pop("pit_lever")
+        v.ROOMS["bad_rooms"].pop("pit_slide")
 
     players = generate_players(human_player_count, total_player_count, starting_gold)
     print("\nGenerating Maze...")
@@ -286,7 +287,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                         elif player_selection == len(player_room.paths) + 1:
                             player.check_inventory(player_room, rooms, players)
                         else:
-                            rm.display_players_in_room(player_room, player.name)
+                            v.ROOM_HELPER_FUNCTIONS["display_players_in_room"](player_room, player.name)
                             sleep(2.5)
                 else:
                     chosen_direction = r.choice(player_room.paths)  # Add AI logic here
@@ -300,7 +301,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                         if player.state[0] != "nope":
                             room.entered(player, rooms, players)
                         else:
-                            rm.put_player_in_room(player, room, rooms)
+                            v.ROOM_HELPER_FUNCTIONS["put_player_in_room"](player, room, rooms)
                             player.state = ["default", None]
                             if player.human:
                                 print("\nYou enter the room and care not for what is inside. You smile, and then"
@@ -316,8 +317,8 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                     break
         for room in rooms:  # Moves any moving placed items
             for item in room.placed_items:
-                if item == i.encountered_goblin:
-                    i.move_goblin(rooms, room)
+                if item == v.ITEM_HELPER_FUNCTIONS["encountered_goblin"]:
+                    v.ITEM_HELPER_FUNCTIONS["move_goblin"](rooms, room)
 
     time_taken_seconds = time_taken % 60
     time_taken_minutes = time_taken // 60
