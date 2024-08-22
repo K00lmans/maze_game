@@ -326,4 +326,5 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
     print(f"\n{winning_player.name} has won the game!\nThe game took {time_taken_hours} hours, {time_taken_minutes}"
           f" minutes, and {time_taken_seconds} seconds!\nDuring that time, they entered"
           f" {len(winning_player.visited_rooms)} rooms out of {len(rooms)} total!\n\nThe full map:")
+    print(v.generate_maze_image(rooms))
     sleep(15)
