@@ -1,4 +1,4 @@
-"""This file stores all global variables for use across files.
+"""This file stores all global variables and functions for use across files.
 
 Note: I have no idea why this works, I just stole it from StackOverflow.
 
@@ -145,3 +145,84 @@ def init():
     }
     global HUMAN_ONLY_ITEMS
     HUMAN_ONLY_ITEMS = [i.match, i.compass, i.magic_map]  # Items the AI can't use
+
+
+def generate_maze_image(rooms_to_display, player=None):
+    """Generates an ascii representation of the maze"""
+    # Make sure the min and max values correspond to a room
+    max_x = rooms_to_display[0].x
+    min_x = rooms_to_display[0].x
+    max_y = rooms_to_display[0].y
+    min_y = rooms_to_display[0].y
+    for room in rooms_to_display:
+        if room.x > max_x:
+            max_x = room.x
+        if room.x < min_x:
+            min_x = room.x
+        if room.y > max_y:
+            max_y = room.y
+        if room.y < min_y:
+            min_y = room.y
+    empty_row = []
+    for _ in range((max_x - min_x) + 1):
+        empty_row.append(None)
+    location_relative_room_grid = []
+    for _ in range((max_y - min_y) + 1):
+        location_relative_room_grid.append(empty_row.copy())
+
+    # I don't really know how this translation code works
+    # It was also made assuming a room at (0, 0) and I don't know if it breaks if that's not true
+    for room in rooms_to_display:
+        translated_x = room.x + abs(min_x)
+        translated_y = max_y - room.y
+        location_relative_room_grid[translated_y][translated_x] = room
+
+    map_image = ""
+    for row in location_relative_room_grid:
+        printed_room_row = ["", "", "", "", ""]
+        for room in row:
+            if room is None:
+                for text_row_number in range(len(printed_room_row)):
+                    printed_room_row[text_row_number] += "     "
+            else:
+                if room.style in list(ROOMS["good_rooms"].values()):
+                    room_category = "G"
+                elif room.style in list(ROOMS["bad_rooms"].values()):
+                    room_category = "B"
+                elif room.style in list(ROOMS["special_rooms"].values()):
+                    room_category = "S"
+                elif room.style == ROOMS["other_rooms"]["start"]:
+                    room_category = "⌂"
+                elif room.style == ROOMS["other_rooms"]["empty"]:
+                    room_category = "E"
+                elif room.style == ROOMS["other_rooms"]["goal"]:
+                    room_category = "G"
+                elif room.style == ROOMS["other_rooms"]["shop"]:
+                    room_category = "$"
+                else:
+                    room_category = "U"
+                if player is not None:
+                    if player.name in room.occupants:
+                        room_category = "C"
+
+                printed_room_row[1] += " ┌─┐ "
+                printed_room_row[3] += " └─┘ "
+                if "NORTH" in room.paths:
+                    printed_room_row[0] += "  ▲  "
+                else:
+                    printed_room_row[0] += "     "
+                if "SOUTH" in room.paths:
+                    printed_room_row[4] += "  ▼  "
+                else:
+                    printed_room_row[4] += "     "
+                if "WEST" in room.paths:
+                    printed_room_row[2] += f"◄│{room_category}│"
+                else:
+                    printed_room_row[2] += f" │{room_category}│"
+                if "EAST" in room.paths:
+                    printed_room_row[2] += "►"
+                else:
+                    printed_room_row[2] += " "
+        for text_row in printed_room_row:
+            map_image += text_row + "\n"
+    return map_image

@@ -131,7 +131,7 @@ def generate_players(human_players: int, total_players: int, starter_gold: float
             chosen_difficulty = difficulty_modifiers[int(answer)]
             human_difficulties.append(chosen_difficulty)
             generated_players.append(v.Player(True, player_name, starter_gold, chosen_difficulty))
-            # Really wanted to include this in the Player __init__ function but that caused issues
+
             if chosen_difficulty == -1:
                 generated_players[-1].inventory.append(v.ITEMS["compass"])
                 generated_players[-1].inventory.append(v.ITEMS["magic_map"])
@@ -325,5 +325,5 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
     time_taken_hours = time_taken_minutes // 60
     print(f"\n{winning_player.name} has won the game!\nThe game took {time_taken_hours} hours, {time_taken_minutes}"
           f" minutes, and {time_taken_seconds} seconds!\nDuring that time, they entered"
-          f" {len(winning_player.visited_rooms)} rooms out of {len(rooms)} total!")
-    sleep(10)
+          f" {len(winning_player.visited_rooms)} rooms out of {len(rooms)} total!\n\nThe full map:")
+    sleep(15)

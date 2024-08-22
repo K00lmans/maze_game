@@ -384,84 +384,10 @@ def magic_map(usable: bool, player: v.Player, players=None, current_room=None, r
               " say something to activate it. You quietly murmur some thinking sounds to yourself when suddenly that"
               " gentle probing becomes blindingly powerful and you fall to your knees. Soon the feeling fades and you"
               " get back on your feet. When you look back down at the parchment, you can see that it now shows a map.")
-
         rooms_to_display = player.visited_rooms.copy()
         # Displays only most recently visited rooms
-        while len(player.visited_rooms) > len(rooms)/(3 + player.difficulty):
+        while len(rooms_to_display) > len(rooms)/(3 + player.difficulty):
             rooms_to_display.pop(0)
-        # Make sure the min and max values correspond to a room
-        max_x = rooms_to_display[0].x
-        min_x = rooms_to_display[0].x
-        max_y = rooms_to_display[0].y
-        min_y = rooms_to_display[0].y
-        for room in rooms_to_display:
-            if room.x > max_x:
-                max_x = room.x
-            if room.x < min_x:
-                min_x = room.x
-            if room.y > max_y:
-                max_y = room.y
-            if room.y < min_y:
-                min_y = room.y
-        empty_row = []
-        for _ in range((max_x - min_x) + 1):
-            empty_row.append(None)
-        location_relative_room_grid = []
-        for _ in range((max_y - min_y) + 1):
-            location_relative_room_grid.append(empty_row.copy())
-
-        # I don't really know how this translation code works
-        # It was also made assuming a room at (0, 0) and I don't know if it breaks if that's not true
-        for room in rooms_to_display:
-            translated_x = room.x + abs(min_x)
-            translated_y = max_y - room.y
-            location_relative_room_grid[translated_y][translated_x] = room
-
-        for row in location_relative_room_grid:
-            printed_room_row = ["", "", "", "", ""]
-            for room in row:
-                if room is None:
-                    for text_row_number in range(len(printed_room_row)):
-                        printed_room_row[text_row_number] += "     "
-                else:
-                    if player.name in room.occupants:
-                        room_category = "C"
-                    elif room.style in list(v.ROOMS["good_rooms"].values()):
-                        room_category = "G"
-                    elif room.style in list(v.ROOMS["bad_rooms"].values()):
-                        room_category = "B"
-                    elif room.style in list(v.ROOMS["special_rooms"].values()):
-                        room_category = "S"
-                    elif room.style == v.ROOMS["other_rooms"]["start"]:
-                        room_category = "⌂"
-                    elif room.style == v.ROOMS["other_rooms"]["empty"]:
-                        room_category = "E"
-                    elif room.style == v.ROOMS["other_rooms"]["goal"]:
-                        room_category = "G"
-                    elif room.style == v.ROOMS["other_rooms"]["shop"]:
-                        room_category = "$"
-                    else:
-                        room_category = "U"
-                    printed_room_row[1] += " ┌─┐ "
-                    printed_room_row[3] += " └─┘ "
-                    if "NORTH" in room.paths:
-                        printed_room_row[0] += "  ▲  "
-                    else:
-                        printed_room_row[0] += "     "
-                    if "SOUTH" in room.paths:
-                        printed_room_row[4] += "  ▼  "
-                    else:
-                        printed_room_row[4] += "     "
-                    if "WEST" in room.paths:
-                        printed_room_row[2] += f"◄│{room_category}│"
-                    else:
-                        printed_room_row[2] += f" │{room_category}│"
-                    if "EAST" in room.paths:
-                        printed_room_row[2] += "►"
-                    else:
-                        printed_room_row[2] += " "
-            for text_row in printed_room_row:
-                print(text_row)
-
+        print(v.generate_maze_image(rooms_to_display, player))
         sleep(5)
         print("After spending some time getting your bearings with the map, you decide to put it pack in your pack.")

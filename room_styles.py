@@ -345,6 +345,10 @@ def wise_old_man(room_info: v.Room, player_profile: v.Player, rooms: list, playe
         display_players_in_room(room_info)
 
 
+def mimic():
+    pass
+
+
 # Good room styles
 def small_treasure(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """Gives 2-ish gold"""
@@ -698,3 +702,7 @@ def pickpocket(room_info: v.Room, player_profile: v.Player, rooms: list, players
         display_players_in_room(room_info)
     if len(player_profile.inventory) > 0:
         player_profile.inventory.remove(r.choice(player_profile.inventory))
+
+
+def ambush():
+    pass
