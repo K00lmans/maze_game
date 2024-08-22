@@ -196,7 +196,7 @@ def generate_maze_image(rooms_to_display, player=None):
                 elif room.style == ROOMS["other_rooms"]["empty"]:
                     room_category = "E"
                 elif room.style == ROOMS["other_rooms"]["goal"]:
-                    room_category = "G"
+                    room_category = "☆"
                 elif room.style == ROOMS["other_rooms"]["shop"]:
                     room_category = "$"
                 else:
