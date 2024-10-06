@@ -33,9 +33,7 @@ variable file.
 10: AI currently can not buy or use items, so you don't HAVE to add code for the AI using it. Doing so will future-proof
 your code for when AI using items is added."""
 
-import random as r
 import math as m
-from time import sleep
 
 import global_vars as v
 
@@ -119,7 +117,7 @@ def move_goblin(rooms: list, room: v.Room):
     """Logic for moving the goblin"""
     room.placed_items.remove(encountered_goblin)
     # He can cross the whole maze instantly because it is a fast little goober
-    new_room = r.choice(rooms[:-1])  # Prevents it from being in the goal room
+    new_room = v.r.choice(rooms[:-1])  # Prevents it from being in the goal room
     new_room.placed_items.append(encountered_goblin)
 
 
@@ -190,7 +188,7 @@ def swapper_remote(usable: bool, player: v.Player, players=None, room=None, room
                 print("You are unsure if the machine was able to do it's job before the rapid dismantalization of the"
                       " device, however you get a strong feeling that it has.")
         else:
-            swapped_players = r.choice(players)
+            swapped_players = v.r.choice(players)
             if swapped_players[0].human or swapped_players[1].human:
                 print(f"{player.name} has swapped {swapped_players[0].name} and {swapped_players[1].name}.")
 
@@ -232,7 +230,7 @@ def gold_potion(usable: bool, player: v.Player, players=None, room=None, rooms=N
         player.inventory.remove(gold_potion)
         found_new_room = False
         while not found_new_room:  # Reminder to get rid of the need for this while loop later
-            direction = r.choice(["NORTH", "EAST", "SOUTH", "WEST"])
+            direction = v.r.choice(["NORTH", "EAST", "SOUTH", "WEST"])
             for possible_new_room in rooms:
                 if possible_new_room.x == (room.x + v.Directions[direction].value[0]) and possible_new_room.y == (
                         room.y + v.Directions[direction].value[1]):
@@ -261,7 +259,7 @@ def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
                         other_players_in_room.append(person)
                 other_players_in_room.remove(player)
                 # The more people in the room, the more likely to fail
-                if r.randint(0, 10 - len(other_players_in_room)) != 0:
+                if v.r.randint(0, 10 - len(other_players_in_room)) != 0:
                     for player_in_room in other_players_in_room:
                         player_in_room.gold -= 4 - player.difficulty
                     player.gold += (4 - player.difficulty) * len(other_players_in_room)
@@ -298,7 +296,7 @@ def dagger(usable: bool, player: v.Player, players=None, room=None, rooms=None):
                               f" {other_players_in_room[-1]}. You tell them that anyone who does not hand over"
                               f" {4 - player.difficulty} gold is going to be stabbed. They all look at each other, nod,"
                               f" and then before you can react, jump right at you and all dogpile you. You lose grip of"
-                              f" the dagger and {r.choice(other_players_in_room)} grabs it and jumps back up. As if on"
+                              f" the dagger and {v.r.choice(other_players_in_room)} grabs it and jumps back up. As if on"
                               f" cue, everybody else also slowly gets up. Once they are up, standing in front of you,"
                               f" they begin to chant.\n\n'NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO MORE NO"
                               f" MORE NO MORE NO MORE'\n\nAs you stare in disbelief, the one who grabbed the dagger"
@@ -338,7 +336,7 @@ def compass(usable: bool, player: v.Player, players=None, room=None, rooms=None)
         print("Compass\n  A simple compass. On the back is a label stating that it points to what one desires most.")
     if check_if_used(usable):  # Warning! Math ahead!
         # Makes the compass not perfect in line with the lore of it pointing to what you desire most
-        target_room = rooms[-1] if r.randint(0, int(len(rooms)/(3 + player.difficulty))) != 0 else r.choice(rooms)
+        target_room = rooms[-1] if v.r.randint(0, int(len(rooms)/(3 + player.difficulty))) != 0 else v.r.choice(rooms)
         x_distance = target_room.x - room.x
         y_distance = target_room.y - room.y
         x_sign = m.copysign(1, x_distance)
@@ -389,5 +387,10 @@ def magic_map(usable: bool, player: v.Player, players=None, current_room=None, r
         while len(rooms_to_display) > len(rooms)/(3 + player.difficulty):
             rooms_to_display.pop(0)
         print(v.generate_maze_image(rooms_to_display, player))
-        sleep(5)
+        v.t.sleep(5)
         print("After spending some time getting your bearings with the map, you decide to put it pack in your pack.")
+
+
+def wayfarers_coin():
+    """Shows the next room in the most efficient path to the goal"""
+    pass

@@ -5,7 +5,7 @@ Note: As with all dev tools, written without usability in mind, use at your own 
 If you move the room generation code to a different file, please change the import statement."""
 
 from time import sleep
-from main_game_loop import generate_maze_layout
+from maze_generation import generate_maze_layout
 from global_vars import generate_maze_image
 
 room_count = int(input("room count: "))

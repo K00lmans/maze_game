@@ -9,7 +9,7 @@ This code is not written for usability, use at your own risk.
 
 Because I'm lazy, you have to put the times into the file yourself."""
 
-from main_game_loop import generate_maze_layout
+from maze_generation import generate_maze_layout
 from time import time
 
 

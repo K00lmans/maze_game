@@ -1,120 +1,6 @@
-from time import sleep, time
-import random as r
-
 import global_vars as v
 
 v.init()  # Creates all the global variables for all the files to use
-
-
-def assign_rooms(maze_layout: list, special_rooms: list, good_room_count: int, bad_room_count: int, shop_count: int):
-    if __name__ == "__main__":  # Prevents excess printing when testing
-        print("\nAssigning room styles...")
-
-    for count, room_style in enumerate(special_rooms):
-        chosen_room = r.choice(maze_layout)
-        while chosen_room.style != v.ROOMS["other_rooms"]["empty"]:
-            chosen_room = r.choice(maze_layout)
-        chosen_room.style = room_style
-
-    while good_room_count != 0:
-        chosen_room = r.choice(maze_layout)
-        if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
-            chosen_room.style = r.choice(list(v.ROOMS["good_rooms"].values()))
-            good_room_count -= 1
-
-    while bad_room_count != 0:
-        chosen_room = r.choice(maze_layout)
-        if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
-            chosen_room.style = r.choice(list(v.ROOMS["bad_rooms"].values()))
-            bad_room_count -= 1
-
-    while shop_count != 0:
-        chosen_room = r.choice(maze_layout)
-        if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
-            chosen_room.style = v.ROOMS["other_rooms"]["shop"]
-            shop_count -= 1
-
-
-def generate_maze_layout(room_count: int) -> list:
-    """Creates an entity, called room_crawler, which is randomly shifted north, east, south, and west. Each time this
-    entity moves, it first adds a path from the room at its old location to its new one if it does not already exist.
-    This allows the dynamic creation of oneway paths. After it moves, it checks if there is a room in its new location,
-    and if there is not adds an empty room to that location. It starts by adding the start room at (0, 0) and once it
-    has added the number of rooms stored in the room_count variable, it continues to move till it has found an empty
-    spot once more and then creates the goal room at that spot. This guarantees the goal room will have only one
-    entrance."""
-    time_of_last_player_update = time()
-    starting_room_count = room_count
-    generated_rooms = []
-    room_crawler = [0, 0]
-    generated_rooms.append(v.Room(v.ROOMS["other_rooms"]["start"], room_crawler[0], room_crawler[1]))
-
-    room_crawler_room = generated_rooms[0]  # Keeps track of the room the room crawler is at to reduce repeated searches
-    max_x_y = [0, 0]
-    min_x_y = [0, 0]
-    while room_count >= 0:
-        possible_directions = ["NORTH", "NORTH", "EAST", "EAST", "SOUTH", "SOUTH", "WEST", "WEST"]
-        # The 1.125, 1.25, and 1.5 are damper values to limit overcorrection
-        if max_x_y[0] > abs(min_x_y[0] * 1.125):
-            possible_directions.remove("EAST")
-            if max_x_y[0] > abs(min_x_y[0] * 1.25):
-                possible_directions.append("WEST")
-                if max_x_y[0] > abs(min_x_y[0] * 1.5):
-                    possible_directions.remove("EAST")
-        elif abs(min_x_y[0]) > (max_x_y[0] * 1.125):
-            possible_directions.remove("WEST")
-            if abs(min_x_y[0]) > (max_x_y[0] * 1.25):
-                possible_directions.append("EAST")
-                if abs(min_x_y[0]) > (max_x_y[0] * 1.5):
-                    possible_directions.remove("WEST")
-        if max_x_y[1] > abs(min_x_y[1] * 1.125):
-            possible_directions.remove("NORTH")
-            if max_x_y[1] > abs(min_x_y[1] * 1.25):
-                possible_directions.append("SOUTH")
-                if max_x_y[1] > abs(min_x_y[1] * 1.5):
-                    possible_directions.remove("NORTH")
-        elif abs(min_x_y[1]) > (max_x_y[1] * 1.125):
-            possible_directions.remove("SOUTH")
-            if abs(min_x_y[1]) > (max_x_y[1] * 1.25):
-                possible_directions.append("NORTH")
-                if abs(min_x_y[1]) > (max_x_y[1] * 1.5):
-                    possible_directions.remove("SOUTH")
-
-        direction = r.choice(possible_directions)
-        if direction not in room_crawler_room.paths:
-            room_crawler_room.paths.append(direction)
-
-        room_crawler[0] += v.Directions[direction].value[0]
-        room_crawler[1] += v.Directions[direction].value[1]
-        if room_crawler[0] > max_x_y[0]:
-            max_x_y[0] = room_crawler[0]
-        elif room_crawler[0] < min_x_y[0]:
-            min_x_y[0] = room_crawler[0]
-        if room_crawler[1] > max_x_y[1]:
-            max_x_y[1] = room_crawler[1]
-        elif room_crawler[1] < min_x_y[1]:
-            min_x_y[1] = room_crawler[1]
-
-        new_room = True
-        for room in generated_rooms:
-            if room_crawler[0] == room.x and room_crawler[1] == room.y:
-                new_room = False
-                room_crawler_room = room
-                break
-        if new_room:
-            generated_rooms.append(
-                v.Room(v.ROOMS["other_rooms"]["empty"] if room_count != 0 else v.ROOMS["other_rooms"]["goal"],
-                       room_crawler[0], room_crawler[1]))
-            room_crawler_room = generated_rooms[-1]
-            room_count -= 1
-            # Make sure the player is updated every second or so on generation progress
-            if (time() - time_of_last_player_update) >= 1:  # Done only when a room is added to keep run speed up
-                if __name__ == "__main__":  # Prevents excess printing when testing
-                    print(f"\nRoom generation {int(100 - ((room_count / starting_room_count) * 100))}% done.")
-                    time_of_last_player_update = time()
-    if __name__ == "__main__":  # Prevents excess printing when testing
-        print("\nRoom layout generated...")
-    return generated_rooms
 
 
 def generate_players(human_players: int, total_players: int, starter_gold: float) -> list:
@@ -131,15 +17,9 @@ def generate_players(human_players: int, total_players: int, starter_gold: float
             chosen_difficulty = difficulty_modifiers[int(answer)]
             human_difficulties.append(chosen_difficulty)
             generated_players.append(v.Player(True, player_name, starter_gold, chosen_difficulty))
-
-            if chosen_difficulty == -1:
-                generated_players[-1].inventory.append(v.ITEMS["compass"])
-                generated_players[-1].inventory.append(v.ITEMS["magic_map"])
-            elif chosen_difficulty == 0:
-                generated_players[-1].inventory.append(r.choice([v.ITEMS["compass"], v.ITEMS["magic_map"]]))
             human_players -= 1
         else:
-            generated_players.append(v.Player(False, r.choice(NPC_NAME_LIST), starter_gold,
+            generated_players.append(v.Player(False, v.r.choice(NPC_NAME_LIST), starter_gold,
                                               -round(sum(human_difficulties) / len(human_difficulties))))
     return generated_players
 
@@ -147,13 +27,13 @@ def generate_players(human_players: int, total_players: int, starter_gold: float
 if __name__ == "__main__":  # Allows for testing of this file's functions, also just good practice
     try:
         file = open("npc_names.txt", "r", encoding='utf-8')
-    except FileNotFoundError:  # Allows this code to be run complied
+    except FileNotFoundError:  # Allows this code to be run "complied"
         file = open("_internal\\npc_names.txt", "r", encoding='utf-8')
     NPC_NAME_LIST = file.read().split('\n')  # Stolen from StackOverflow
     file.close()
 
     print("Welcome to:\n\nMAZE GAME")  # Replace with splash art
-    sleep(5)
+    v.t.sleep(5)
     human_player_count = 0
     while human_player_count == 0 or human_player_count > 10:
         try:
@@ -168,7 +48,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
     # Default game values
     total_player_count = 4 if (human_player_count % 5) != 0 else human_player_count
     starting_gold = float(total_player_count)  # Compensates for charity room style
-    total_rooms = 50
+    total_rooms = 75
     enabled_special_rooms = list(v.ROOMS["special_rooms"].values())
     # Recommended ratios
     good_rooms = total_rooms // 8
@@ -186,7 +66,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                     raise ValueError
                 starting_gold = float(
                     input(f"\nHow much gold will each of you start with?\n(Default: {total_player_count})\n"))
-                total_rooms = int(input("\nHow many rooms do you want this maze to have?\n(Default: 50)\n"))
+                total_rooms = int(input("\nHow many rooms do you want this maze to have?\n(Default: 75)\n"))
                 good_rooms = int(
                     input(f"\nHow many positive rooms do you want this maze to have?\n(Default: {total_rooms // 8})\n"))
                 bad_rooms = int(
@@ -226,8 +106,8 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
 
     # Removes special rooms if adding all enabled special rooms would make too many rooms not empty
     try:
-        enabled_special_rooms = r.sample(enabled_special_rooms,
-                                         int((total_rooms / 2) - (good_rooms + bad_rooms + shops)))
+        enabled_special_rooms = v.r.sample(enabled_special_rooms,
+                                           int((total_rooms / 2) - (good_rooms + bad_rooms + shops)))
     except ValueError:
         pass
     # Removes rooms related to a special room if the special room is not enabled
@@ -237,13 +117,14 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
 
     players = generate_players(human_player_count, total_player_count, starting_gold)
     print("\nGenerating Maze...")
-    rooms = generate_maze_layout(total_rooms)
-    assign_rooms(rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
+    rooms = v.mg.generate_maze_layout(total_rooms)
+    print("\nAssigning room styles...")
+    v.mg.assign_rooms(rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
     print("\nMaze generated! Your game will begin shortly.")
 
-    sleep(1)
+    v.t.sleep(1)
 
-    game_start_time = time()
+    game_start_time = v.t.time()
     print("\n\nIt was a direct order from the king. The first to find it would be showered in glory and gold. While you"
           " may have all been good friends before, this mandate changed things. You all headed out to the great"
           " underground maze and while the journey was peaceful, you knew that the second you all entered, all gloves"
@@ -264,7 +145,7 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
             if type(player.state[0]) is not str:  # Activates stuck spots
                 player_room.entered(player, rooms, players)
                 player.state[0](player)
-                sleep(2.5)
+                v.t.sleep(2.5)
             if player.state[0] == "default":  # Allows for players to move the turn they escape from stuck spots
                 if player.human:
                     chosen_direction = False
@@ -288,9 +169,9 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                             player.check_inventory(player_room, rooms, players)
                         else:
                             v.ROOM_HELPER_FUNCTIONS["display_players_in_room"](player_room, player.name)
-                            sleep(2.5)
+                            v.t.sleep(2.5)
                 else:
-                    chosen_direction = r.choice(player_room.paths)  # Add AI logic here
+                    chosen_direction = v.r.choice(player_room.paths)  # Add AI logic here
 
                 player.x += v.Directions[chosen_direction].value[0]
                 player.y += v.Directions[chosen_direction].value[1]
@@ -307,13 +188,13 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                                 print("\nYou enter the room and care not for what is inside. You smile, and then"
                                       " realize the image has fallen off your head. You are sad, but you know that it"
                                       " was what that heavy man would have wanted.")
-                        sleep(2.5)
+                        v.t.sleep(2.5)
                         break
 
                 if player.state[0] == "winner":
                     winner = True
                     winning_player = player
-                    time_taken = int(time() - game_start_time)
+                    time_taken = int(v.t.time() - game_start_time)
                     break
         for room in rooms:  # Moves any moving placed items
             for item in room.placed_items:
@@ -325,6 +206,9 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
     time_taken_hours = time_taken_minutes // 60
     print(f"\n{winning_player.name} has won the game!\nThe game took {time_taken_hours} hours, {time_taken_minutes}"
           f" minutes, and {time_taken_seconds} seconds!\nDuring that time, they entered"
-          f" {len(winning_player.visited_rooms)} rooms out of {len(rooms)} total!\n\nThe full map:")
+          f" {len(winning_player.visited_rooms)} rooms out of {len(rooms)} total!")
+    v.t.sleep(5)
+    print("\nThe full map:")
+    v.t.sleep(.5)
     print(v.generate_maze_image(rooms))
-    sleep(15)
+    v.t.sleep(10)

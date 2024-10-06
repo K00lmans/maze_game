@@ -1,11 +1,13 @@
-"""This file stores all global variables and functions for use across files.
+"""This file stores all global variables, imports, and functions for use across files.
 
 Note: I have no idea why this works, I just stole it from StackOverflow.
 
 Do not type hint this file as it gets funky."""
 
 from enum import Enum
-from time import sleep
+import time as t
+import random as r
+import maze_generation as mg
 
 
 class Directions(Enum):
@@ -28,7 +30,7 @@ class Room:
         if len(self.placed_items) > 0:
             for item in self.placed_items:
                 item[0](entering_player, self, item)
-                sleep(2)
+                t.sleep(2)
         self.style(self, entering_player, room_list, player_list)
 
 
@@ -41,7 +43,12 @@ class Player:
         self.x = 0
         self.y = 0
         self.state = ["default", None]  # First is the name of the state, second is a place for data about the state
-        self.inventory = []
+        if difficulty == -1:
+            self.inventory = [ITEMS["compass"], ITEMS["magic_map"]]
+        elif difficulty == 0:
+            self.inventory = [r.choice([ITEMS["compass"], ITEMS["magic_map"]])]
+        else:
+            self.inventory = []
         self.visited_rooms = []
 
     def check_inventory(self, room, rooms, players):
@@ -52,7 +59,7 @@ class Player:
                   f" coins in debt.")
         if len(self.inventory) == 0:
             print("You currently have nothing in your pack.")
-            sleep(2.5)
+            t.sleep(2.5)
         else:
             done_using_items = False
             while not done_using_items:
@@ -69,7 +76,7 @@ class Player:
                         print("Enter only the number of the item")
                 if 1 <= selection <= len(self.inventory):
                     self.inventory[selection - 1](True, self, players, room, rooms)
-                    sleep(2.5)
+                    t.sleep(2.5)
                 else:
                     done_using_items = True
 
@@ -171,7 +178,7 @@ def generate_maze_image(rooms_to_display, player=None):
         location_relative_room_grid.append(empty_row.copy())
 
     # I don't really know how this translation code works
-    # It was also made assuming a room at (0, 0) and I don't know if it breaks if that's not true
+    # It was also made assuming a room at (0, 0) and I don't know if there is any glitches induced when that's not true
     for room in rooms_to_display:
         translated_x = room.x + abs(min_x)
         translated_y = max_y - room.y

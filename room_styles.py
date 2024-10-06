@@ -31,8 +31,6 @@ player.
 11: If you want to remove room styles, do not remove them from here, simply remove them from the category list in the
 variable file."""
 
-import random as r
-
 import global_vars as v
 
 
@@ -99,7 +97,7 @@ def put_player_in_room(player: v.Player, entered_room: v.Room, rooms: list):
 
 
 def in_pit(player_profile: v.Player):
-    if r.randint(1, 4 + player_profile.difficulty) == 1:
+    if v.r.randint(1, 4 + player_profile.difficulty) == 1:
         player_profile.state[1] = True
     if player_profile.human:
         if player_profile.state[1]:
@@ -113,7 +111,7 @@ def in_pit(player_profile: v.Player):
 
 
 def in_combat(player_profile: v.Player):
-    player_profile.state[1][0] -= r.randint(1, player_profile.state[1][1])
+    player_profile.state[1][0] -= v.r.randint(1, player_profile.state[1][1])
     if player_profile.human:
         if player_profile.state[1][0] <= 0:
             print("\nAfter a long battle, you finally have defeated the monster. The gates around you fall and you can"
@@ -140,7 +138,7 @@ def empty(room_info: v.Room, player_profile: v.Player, rooms: list, players: lis
     put_player_in_room(player_profile, room_info, rooms)
     if player_profile.human:
         # An example of the room based rng number being used. All usage should reflect this example
-        if generate_room_rng_number(room_info) == r.randint(0, generate_room_based_rng_number(rooms)):
+        if generate_room_rng_number(room_info) == v.r.randint(0, generate_room_based_rng_number(rooms)):
             print("\nYou enter a large empty room. Your gaze is pulled upward and instead of seeing the ceiling that"
                   " you would have expected, you see right through the roof. Behind the wall is a giant being shrouded"
                   " in mist. Though shrouded, you can still make out four long, thin appendages, one coming from each"
@@ -166,7 +164,7 @@ def goal(room_info: v.Room, player_profile: v.Player, rooms: list, players: list
 def shop(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """A place to buy items"""
     put_player_in_room(player_profile, room_info, rooms)
-    shop_selection = r.sample(list(v.ITEMS.values()), r.randint(3, len(v.ITEMS) - (1 + player_profile.difficulty)))
+    shop_selection = v.r.sample(list(v.ITEMS.values()), v.r.randint(3, len(v.ITEMS) - (1 + player_profile.difficulty)))
     if player_profile.human:  # Still needs way for AI to buy stuff
         print("\nYou enter the room and see that a small storefront has been set up.")
         display_players_in_room(room_info)
@@ -239,7 +237,7 @@ def combat(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
         display_players_in_room(room_info)
     if player_profile.state[0] != in_combat:
         # Min health is min hits plus one to prevent insta-kills
-        enemy_health = r.randint(3 + player_profile.difficulty, 10*(2 + player_profile.difficulty))
+        enemy_health = v.r.randint(3 + player_profile.difficulty, 10*(2 + player_profile.difficulty))
         # The state data indicates the enemy's health and the max damage the player can do per turn
         player_profile.state = [in_combat, [enemy_health, (enemy_health//(2 + player_profile.difficulty)) + 1]]
 
@@ -271,7 +269,7 @@ def swapper_control(room_info: v.Room, player_profile: v.Player, rooms: list, pl
         print(f"\nAfter everything is set up, you push the big red button and swap {selected_players[0].name} and"
               f" {selected_players[1].name}.")
     else:
-        selected_players = r.sample(players, 2)
+        selected_players = v.r.sample(players, 2)
         if selected_players[0].human or selected_players[1].human:
             print(f"\n{player_profile.name} has swapped the locations of {selected_players[0].name} and"
                   f" {selected_players[1].name}.")
@@ -311,7 +309,7 @@ def psycho(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
                     " gasy, jpe radr epiaf oy goy pm yjr rarqjsmyd smf yjr yityar?'\nYou notice they have scrawled some"
                     " form of art using only the characters from a printing press on the wall."]
     if player_profile.human:
-        if generate_room_rng_number(room_info) == r.randint(0, generate_room_based_rng_number(rooms)):
+        if generate_room_rng_number(room_info) == v.r.randint(0, generate_room_based_rng_number(rooms)):
             # Wanted to use AI for this because I thought it would be funny, but the AI writing was really bad
             print("\nYou enter the room and see a small pill on a pedestal. As you walk up to it, you feel compelled to"
                   " take it. Before you can even think, you have swallowed the pill. You suddenly feel,\n djogyrf?"
@@ -320,7 +318,7 @@ def psycho(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
                   " to continue on.")
         else:
             print("\n You enter the room and see a person chained to the wall murmuring something to themselves. As you"
-                  f" get closer you hear what they are saying:\n{r.choice(crazy_people)}")
+                  f" get closer you hear what they are saying:\n{v.r.choice(crazy_people)}")
         display_players_in_room(room_info)
 
 
@@ -341,11 +339,17 @@ def wise_old_man(room_info: v.Room, player_profile: v.Player, rooms: list, playe
         print(
             "\nYou enter the room and see an old man sitting in the middle of it with a sign around his neck that says"
             " 'Free Wisdom'.\nAs you finish reading the sign, he turns to face you and says:\n"
-            f"{r.choice(old_man_wisdoms)}")
+            f"{v.r.choice(old_man_wisdoms)}")
         display_players_in_room(room_info)
 
 
 def mimic():
+    """A whole bunch of random effects"""
+    pass
+
+
+def pirate_room():
+    """Sing some sea shanties and have a party with some pirates"""
     pass
 
 
@@ -423,7 +427,7 @@ def pit_lever(room_info: v.Room, player_profile: v.Player, rooms: list, players:
     """Sends another player to the pit"""
     put_player_in_room(player_profile, room_info, rooms)
     if player_profile.human:
-        if r.randint(0, 2 - player_profile.difficulty) != 0:  # Can fail to prevent suffering
+        if v.r.randint(0, 2 - player_profile.difficulty) != 0:  # Can fail to prevent suffering
             print("\nYou enter the room and notice that along one of the walls is a large row of levers, each with a"
                   " painting above them. You realize that each painting is of one of your fellow explorers (including"
                   " you) and that pulling a lever will send that person to the pit. You decide to take a further look"
@@ -455,8 +459,8 @@ def pit_lever(room_info: v.Room, player_profile: v.Player, rooms: list, players:
             display_players_in_room(room_info)
             lever_pulled = False
     else:
-        if r.randint(1, 3 + player_profile.difficulty) != 1:  # Can fail to prevent suffering
-            selected_player = r.choice(players)
+        if v.r.randint(1, 3 + player_profile.difficulty) != 1:  # Can fail to prevent suffering
+            selected_player = v.r.choice(players)
             lever_pulled = True
             if selected_player.human:
                 print(f"\n{player_profile.name} has sent {selected_player.name} to the pit.")
@@ -513,11 +517,11 @@ def gold_vacuum(room_info: v.Room, player_profile: v.Player, rooms: list, player
     else:
         selected_player = player_profile
         while selected_player != player_profile:
-            selected_player = r.choice(players)
+            selected_player = v.r.choice(players)
         if selected_player.human:
             print(f"{player_profile} has stolen some gold from {selected_player.name}.")
 
-    coins_stolen = r.randint(1, len(players) - player_profile.difficulty)
+    coins_stolen = v.r.randint(1, len(players) - player_profile.difficulty)
     selected_player.gold -= coins_stolen
     player_profile.gold += coins_stolen
 
@@ -527,7 +531,7 @@ def teleport(room_info: v.Room, player_profile: v.Player, rooms: list, players: 
     """Teleports them to a random room"""
     put_player_in_room(player_profile, room_info, rooms)  # Prevents crashing
     room_info.occupants.remove(player_profile.name)
-    new_room = r.choice(rooms[:-1])  # Prevents teleporting to the goal room and getting trapped
+    new_room = v.r.choice(rooms[:-1])  # Prevents teleporting to the goal room and getting trapped
     player_profile.x = new_room.x
     player_profile.y = new_room.y
     if new_room not in player_profile.visited_rooms:
@@ -543,7 +547,7 @@ def teleport(room_info: v.Room, player_profile: v.Player, rooms: list, players: 
 def pit_slide(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """Sends them to the pit"""
     put_player_in_room(player_profile, room_info, rooms)
-    if r.randint(0, 2 - player_profile.difficulty) == 0:  # Can fail for sanity
+    if v.r.randint(0, 2 - player_profile.difficulty) == 0:  # Can fail for sanity
         room_info.occupants.remove(player_profile.name)
         for room in rooms:
             if room.style == pit:
@@ -573,7 +577,7 @@ def pit_slide(room_info: v.Room, player_profile: v.Player, rooms: list, players:
 def swapper(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """Swaps them with another player"""
     put_player_in_room(player_profile, room_info, rooms)  # Should prevent odd crashing issue
-    swapped_player = r.choice(players)
+    swapped_player = v.r.choice(players)
     if swapped_player != player_profile:
         room_info.occupants.remove(player_profile.name)
         for room in rooms:
@@ -637,7 +641,7 @@ def magnet(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
 def recall(room_info: v.Room, player_profile: v.Player, rooms: list, players: list):
     """Sends them to the home square"""
     put_player_in_room(player_profile, room_info, rooms)
-    if r.randint(0, 2 - player_profile.difficulty) == 0:  # Can fail for sanity
+    if v.r.randint(0, 2 - player_profile.difficulty) == 0:  # Can fail for sanity
         room_info.occupants.remove(player_profile.name)
         rooms[0].occupants.append(player_profile.name)
         player_profile.x, player_profile.y = 0, 0  # Room generation always starts at 0, 0 with the home room
@@ -646,7 +650,7 @@ def recall(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
         sent_home = False
     if player_profile.human:
         if sent_home:
-            if generate_room_rng_number(room_info) == r.randint(0, generate_room_based_rng_number(rooms)):
+            if generate_room_rng_number(room_info) == v.r.randint(0, generate_room_based_rng_number(rooms)):
                 players.remove(player_profile)
                 rooms[0].occupants.remove(player_profile.name)
                 print("\nYou enter a large empty room. You then realize that this room has a hole in it. You did not"
@@ -701,8 +705,9 @@ def pickpocket(room_info: v.Room, player_profile: v.Player, rooms: list, players
                   " it.")
         display_players_in_room(room_info)
     if len(player_profile.inventory) > 0:
-        player_profile.inventory.remove(r.choice(player_profile.inventory))
+        player_profile.inventory.remove(v.r.choice(player_profile.inventory))
 
 
 def ambush():
+    """Removes all your items"""
     pass
