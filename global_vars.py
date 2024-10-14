@@ -22,7 +22,8 @@ class Room:
         self.style = room_style
         self.x = x
         self.y = y
-        self.paths = []
+        self.paths = []  # Used for display, generation, and fallback purposes
+        self.neighbors = {}  # Stores the room objects in each available direction, practically a graph implementation
         self.occupants = []
         self.placed_items = []  # All the items placed in a room
 
@@ -32,6 +33,9 @@ class Room:
                 item[0](entering_player, self, item)
                 t.sleep(2)
         self.style(self, entering_player, room_list, player_list)
+
+    def find_neighboring_rooms(self, room_list):
+        pass
 
 
 class Player:
