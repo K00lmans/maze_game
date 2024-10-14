@@ -78,10 +78,9 @@ def generate_maze_layout(room_count: int) -> list:
             room_crawler_room = generated_rooms[-1]
             room_count -= 1
             # Make sure the player is updated every second or so on generation progress
-            if __name__ == "__main__":  # Prevents excess printing when testing
-                if (v.t.time() - time_of_last_player_update) >= 1:  # Done only when a room is added to keep speed up
-                    print(f"\nRoom generation {int(100 - ((room_count / starting_room_count) * 100))}% done.")
-                    time_of_last_player_update = v.t.time()
+            if (v.t.time() - time_of_last_player_update) >= 1:  # Done only when a room is added to keep speed up
+                print(f"\nRoom generation {int(100 - ((room_count / starting_room_count) * 100))}% done.")
+                time_of_last_player_update = v.t.time()
 
     return generated_rooms
 
@@ -96,10 +95,9 @@ def assign_rooms(maze_layout: list, special_rooms: list, good_room_count: int, b
         while chosen_room.style != v.ROOMS["other_rooms"]["empty"]:
             chosen_room = v.r.choice(maze_layout)
         chosen_room.style = room_style
-        if __name__ == "__main__":  # Prevents excess printing when testing
-            if (v.t.time() - time_of_last_player_update) >= 1:
-                print(f"\nRoom assignment {int((count / total_rooms_to_assign) * 100)}% done.")
-                time_of_last_player_update = v.t.time()
+        if (v.t.time() - time_of_last_player_update) >= 1:
+            print(f"\nRoom assignment {int((count / total_rooms_to_assign) * 100)}% done.")
+            time_of_last_player_update = v.t.time()
     completed_assignments += len(special_rooms)
 
     # Since room counts count down, preemptively add the total then subtract the remaining
@@ -109,10 +107,10 @@ def assign_rooms(maze_layout: list, special_rooms: list, good_room_count: int, b
         if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
             chosen_room.style = v.r.choice(list(v.ROOMS["good_rooms"].values()))
             good_room_count -= 1
-            if __name__ == "__main__":
-                if (v.t.time() - time_of_last_player_update) >= 1:  # Done only when a room is added to reduce checks
-                    print(f"\nRoom assignment"
-                          f" {int(((completed_assignments - good_room_count) / total_rooms_to_assign) * 100)}% done.")
+            if (v.t.time() - time_of_last_player_update) >= 1:  # Done only when a room is added to reduce checks
+                print(f"\nRoom assignment"
+                      f" {int(((completed_assignments - good_room_count) / total_rooms_to_assign) * 100)}% done.")
+                time_of_last_player_update = v.t.time()
 
     completed_assignments += bad_room_count
     while bad_room_count != 0:
@@ -120,10 +118,10 @@ def assign_rooms(maze_layout: list, special_rooms: list, good_room_count: int, b
         if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
             chosen_room.style = v.r.choice(list(v.ROOMS["bad_rooms"].values()))
             bad_room_count -= 1
-            if __name__ == "__main__":
-                if (v.t.time() - time_of_last_player_update) >= 1:
-                    print(f"\nRoom assignment"
-                          f" {int(((completed_assignments - bad_room_count) / total_rooms_to_assign) * 100)}% done.")
+            if (v.t.time() - time_of_last_player_update) >= 1:
+                print(f"\nRoom assignment"
+                      f" {int(((completed_assignments - bad_room_count) / total_rooms_to_assign) * 100)}% done.")
+                time_of_last_player_update = v.t.time()
 
     completed_assignments += shop_count
     while shop_count != 0:
@@ -131,7 +129,7 @@ def assign_rooms(maze_layout: list, special_rooms: list, good_room_count: int, b
         if chosen_room.style == v.ROOMS["other_rooms"]["empty"]:
             chosen_room.style = v.ROOMS["other_rooms"]["shop"]
             shop_count -= 1
-            if __name__ == "__main__":
-                if (v.t.time() - time_of_last_player_update) >= 1:
-                    print(f"\nRoom assignment"
-                          f" {int(((completed_assignments - shop_count) / total_rooms_to_assign) * 100)}% done.")
+            if (v.t.time() - time_of_last_player_update) >= 1:
+                print(f"\nRoom assignment"
+                      f" {int(((completed_assignments - shop_count) / total_rooms_to_assign) * 100)}% done.")
+                time_of_last_player_update = v.t.time()
