@@ -120,6 +120,8 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
     rooms = v.mg.generate_maze_layout(total_rooms)
     print("\nAssigning room styles...")
     v.mg.assign_rooms(rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
+    print("\nRefactoring room data...")
+    v.mg.find_room_neighbors(rooms)
     print("\nMaze generated! Your game will begin shortly.")
 
     v.t.sleep(1)

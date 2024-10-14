@@ -135,3 +135,12 @@ def assign_rooms(maze_layout: list, special_rooms: list, good_room_count: int, b
                 if (v.t.time() - time_of_last_player_update) >= 1:
                     print(f"\nRoom assignment"
                           f" {int(((completed_assignments - shop_count) / total_rooms_to_assign) * 100)}% done.")
+
+
+def find_room_neighbors(rooms: list):
+    time_of_last_update = v.t.time()
+    for count, room in enumerate(rooms):
+        room.find_neighboring_rooms(rooms)
+        if (v.t.time() - time_of_last_update) >= 1:
+            print(f"\nData refactoring {int(((count + 1) / len(rooms)) * 100)}% done.")
+            time_of_last_update = v.t.time()

@@ -35,7 +35,13 @@ class Room:
         self.style(self, entering_player, room_list, player_list)
 
     def find_neighboring_rooms(self, room_list):
-        pass
+        for direction in self.paths:
+            target_room_x = self.x + Directions[direction].value[0]
+            target_room_y = self.y + Directions[direction].value[1]
+            for room in room_list:
+                if room.x == target_room_x and room.y == target_room_y:
+                    self.neighbors[direction] = room
+                    break
 
 
 class Player:
