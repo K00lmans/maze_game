@@ -6,7 +6,9 @@ If you move the room generation code to a different file, please change the impo
 
 from time import sleep
 from maze_generation import generate_maze_layout
-from global_vars import generate_maze_image
+import global_vars as v
+
+v.init()
 
 room_count = int(input("room count: "))
 rooms = generate_maze_layout(room_count)
@@ -27,6 +29,6 @@ print(f"width of {max_x-min_x} with a max of {max_x} and a min of {min_x}")
 print(f"height of {max_y-min_y} with a max of {max_y} and a min of {min_y}")
 sleep(2.5)
 file = open("maze_visualization.txt", "w", encoding="utf-8")
-file.write(generate_maze_image(rooms))
+file.write(v.generate_maze_image(rooms))
 file.close()
 print("\nNew visualisation saved to file")

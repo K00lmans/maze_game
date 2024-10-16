@@ -11,6 +11,10 @@ Because I'm lazy, you have to put the times into the file yourself."""
 
 from maze_generation import generate_maze_layout
 from time import time
+import global_vars as v
+
+
+v.init()
 
 
 runtime = 0
