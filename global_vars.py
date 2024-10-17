@@ -243,3 +243,17 @@ def generate_maze_image(rooms_to_display, player=None):
         for text_row in printed_room_row:
             map_image += text_row + "\n"
     return map_image
+
+
+def find_path_to_goal(starting_room):
+    """Finds the path to the goal using the A* pathfinder algorythm
+
+    The way this works is that each room is assigned a score value that determines an estimate of how likely it is that
+    this is the correct route. It will then take one step in the direction with the best score adding all paths down
+    the line to the next possible path to take. When a new room is added to the list of available directions, the room
+    it came from is stored as its 'parent' value that way once the goal is reached you can simply follow the parents
+    back to the starting room. For this implementation score is calculated by number of rooms between the forthcoming
+    room and the starting room, plus both the vertical and horizontal distance of that room to the goal."""
+    checked_rooms = []
+    # The sub-list is structured as ["room object", "score", "parent"]
+    rooms_to_check = [[starting_room, -1, None]]
