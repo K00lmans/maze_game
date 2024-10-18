@@ -117,12 +117,13 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
 
     players = generate_players(human_player_count, total_player_count, starting_gold)
     print("\nGenerating Maze...")
-    rooms = v.mg.generate_maze_layout(total_rooms)
+    rooms = v.MAZE_GENERATION["generate_maze_layout"](total_rooms)
     print("\nAssigning room styles...")
-    v.mg.assign_rooms(rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
+    v.MAZE_GENERATION["assign_rooms"](rooms, enabled_special_rooms, good_rooms, bad_rooms, shops)
     print("\nRefactoring room data...")
-    v.mg.find_room_neighbors(rooms)
+    v.MAZE_GENERATION["find_room_neighbors"](rooms)
     print("\nMaze generated! Your game will begin shortly.")
+    v.ROOM_LIST = rooms
 
     v.t.sleep(1)
 
@@ -134,18 +135,15 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
           " underground maze here at all is the simple, yet perfectly square hole in the ground. You all hop in and the"
           " hunt begins.")
     for player in players:  # Puts all the players in the starting room
-        rooms[0].occupants.append(player.name)
-        player.visited_rooms.append(rooms[0])
+        v.STARTING_ROOM.occupants.append(player.name)
+        player.visited_rooms.append(v.STARTING_ROOM)
+        player.current_room = v.STARTING_ROOM
     winner = False
     while not winner:
         for player_number, player in enumerate(players):
             print(f"\nIt is player {player_number + 1}'s ({player.name}) turn!{'' if player.human else ' (AI)'}")
-            for room in rooms:
-                if player.x == room.x and player.y == room.y:
-                    player_room = room
-                    break
             if type(player.state[0]) is not str:  # Activates stuck spots
-                player_room.entered(player, rooms, players)
+                player.current_room.entered(player, rooms, players)
                 player.state[0](player)
                 v.t.sleep(2.5)
             if player.state[0] == "default":  # Allows for players to move the turn they escape from stuck spots
@@ -154,10 +152,10 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                     while not chosen_direction:
                         print("\nYou decide you have spent enough time in this room, and survey the room to figure out"
                               " where you can go next.\n")
-                        for direction_count, direction in enumerate(player_room.paths):
+                        for direction_count, direction in enumerate(player.current_room.paths):
                             print(f"{direction_count + 1}: {direction}")
-                        print(f"{len(player_room.paths) + 1}: Check inventory")
-                        print(f"{len(player_room.paths) + 2}: Check who else is in the room")
+                        print(f"{len(player.current_room.paths) + 1}: Check inventory")
+                        print(f"{len(player.current_room.paths) + 2}: Check who else is in the room")
                         selected_input = False
                         while not selected_input:
                             try:
@@ -165,33 +163,29 @@ if __name__ == "__main__":  # Allows for testing of this file's functions, also 
                                 selected_input = True
                             except ValueError:
                                 print("Enter only a number for your selection")
-                        if 0 < player_selection <= len(player_room.paths):
-                            chosen_direction = player_room.paths[player_selection - 1]
-                        elif player_selection == len(player_room.paths) + 1:
-                            player.check_inventory(player_room, rooms, players)
+                        if 0 < player_selection <= len(player.current_room.paths):
+                            chosen_direction = player.current_room.paths[player_selection - 1]
+                        elif player_selection == len(player.current_room.paths) + 1:
+                            player.check_inventory(player.current_room, rooms, players)
                         else:
-                            v.ROOM_HELPER_FUNCTIONS["display_players_in_room"](player_room, player.name)
+                            v.ROOM_HELPER_FUNCTIONS["display_players_in_room"](player.current_room, player.name)
                             v.t.sleep(2.5)
                 else:
-                    chosen_direction = v.r.choice(player_room.paths)  # Add AI logic here
+                    chosen_direction = v.r.choice(player.current_room.paths)  # Add AI logic here
 
-                player.x += v.Directions[chosen_direction].value[0]
-                player.y += v.Directions[chosen_direction].value[1]
-                for room in rooms:
-                    if player.x == room.x and player.y == room.y:
-                        if room not in player.visited_rooms:
-                            player.visited_rooms.append(room)
-                        if player.state[0] != "nope":
-                            room.entered(player, rooms, players)
-                        else:
-                            v.ROOM_HELPER_FUNCTIONS["put_player_in_room"](player, room, rooms)
-                            player.state = ["default", None]
-                            if player.human:
-                                print("\nYou enter the room and care not for what is inside. You smile, and then"
-                                      " realize the image has fallen off your head. You are sad, but you know that it"
-                                      " was what that heavy man would have wanted.")
-                        v.t.sleep(2.5)
-                        break
+                player.current_room = player.current_room.neighbors[chosen_direction]
+                if player.current_room not in player.visited_rooms:
+                    player.visited_rooms.append(player.current_room)
+                if player.state[0] != "nope":
+                    player.current_room.entered(player, rooms, players)
+                else:
+                    v.ROOM_HELPER_FUNCTIONS["put_player_in_room"](player, player.current_room, rooms)
+                    player.state = ["default", None]
+                    if player.human:
+                        print("\nYou enter the room and care not for what is inside. You smile, and then"
+                              " realize the image has fallen off your head. You are sad, but you know that it"
+                              " was what that heavy man would have wanted.")
+                v.t.sleep(2.5)
 
                 if player.state[0] == "winner":
                     winner = True

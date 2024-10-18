@@ -18,6 +18,7 @@ def generate_maze_layout(room_count: int) -> list:
     generated_rooms = []
     room_crawler = [0, 0]
     generated_rooms.append(v.Room(v.ROOMS["other_rooms"]["start"], room_crawler[0], room_crawler[1]))
+    v.STARTING_ROOM = generated_rooms[0]
 
     room_crawler_room = generated_rooms[0]  # Keeps track of the room the room crawler is at to reduce repeated searches
     max_x_y = [0, 0]
@@ -82,6 +83,7 @@ def generate_maze_layout(room_count: int) -> list:
                 print(f"\nRoom generation {int(100 - ((room_count / starting_room_count) * 100))}% done.")
                 time_of_last_player_update = v.t.time()
 
+    v.GOAL_ROOM = generated_rooms[-1]
     return generated_rooms
 
 

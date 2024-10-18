@@ -7,7 +7,6 @@ Do not type hint this file as it gets funky."""
 from enum import Enum
 import time as t
 import random as r
-import maze_generation as mg
 
 
 class Directions(Enum):
@@ -50,8 +49,7 @@ class Player:
         self.name = player_name
         self.gold = starting_coins
         self.difficulty = difficulty
-        self.x = 0
-        self.y = 0
+        self.current_room = None
         self.state = ["default", None]  # First is the name of the state, second is a place for data about the state
         if difficulty == -1:
             self.inventory = [ITEMS["compass"], ITEMS["magic_map"]]
@@ -92,8 +90,16 @@ class Player:
 
 
 def init():
+    global STARTING_ROOM
+    STARTING_ROOM = None
+    global GOAL_ROOM
+    GOAL_ROOM = None
+    global ROOM_LIST
+    ROOM_LIST = []
+
     import room_styles as rm
     import items as i
+    import maze_generation as mg
     good_rooms = {
         "small_treasure": rm.small_treasure,
         "large_treasure": rm.large_treasure,
@@ -139,6 +145,12 @@ def init():
         "put_player_in_room": rm.put_player_in_room,
         "in_pit": rm.in_pit,
         "in_combat": rm.in_combat
+    }
+    global MAZE_GENERATION
+    MAZE_GENERATION = {
+        "generate_maze_layout": mg.generate_maze_layout,
+        "assign_rooms": mg.assign_rooms,
+        "find_room_neighbors": mg.find_room_neighbors
     }
 
     global ITEMS
