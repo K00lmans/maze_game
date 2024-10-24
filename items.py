@@ -192,6 +192,7 @@ def swapper_remote(usable: bool, player: v.Player, players=None, room=None, room
             if swapped_players[0].human or swapped_players[1].human:
                 print(f"{player.name} has swapped {swapped_players[0].name} and {swapped_players[1].name}.")
 
+        # Way to hard to spot fix, come back and just re-write the whole thing
         swapped_players_rooms = [None, None]
         for searched_room in rooms:
             if swapped_players[0].name in searched_room.occupants:

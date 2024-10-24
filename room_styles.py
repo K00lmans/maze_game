@@ -476,8 +476,7 @@ def pit_lever(room_info: v.Room, player_profile: v.Player, rooms: list, players:
             if room.style == pit:
                 pit_room = room
                 break
-        selected_player.x = pit_room.x
-        selected_player.y = pit_room.y
+        selected_player.current_room = pit_room
         selected_player.state = [in_pit, False]
         if pit_room not in selected_player.visited_rooms:
             selected_player.visited_rooms.append(pit_room)
@@ -532,8 +531,7 @@ def teleport(room_info: v.Room, player_profile: v.Player, rooms: list, players: 
     put_player_in_room(player_profile, room_info, rooms)  # Prevents crashing
     room_info.occupants.remove(player_profile.name)
     new_room = v.r.choice(rooms[:-1])  # Prevents teleporting to the goal room and getting trapped
-    player_profile.x = new_room.x
-    player_profile.y = new_room.y
+    player_profile.current_room = new_room
     if new_room not in player_profile.visited_rooms:
         player_profile.visited_rooms.append(new_room)
     new_room.occupants.append(player_profile.name)
@@ -553,8 +551,7 @@ def pit_slide(room_info: v.Room, player_profile: v.Player, rooms: list, players:
             if room.style == pit:
                 pit_room = room
                 break
-        player_profile.x = pit_room.x
-        player_profile.y = pit_room.y
+        player_profile.current_room = pit_room
         player_profile.state = [in_pit, False]
         if pit_room not in player_profile.visited_rooms:
             player_profile.visited_rooms.append(pit_room)
@@ -586,11 +583,11 @@ def swapper(room_info: v.Room, player_profile: v.Player, rooms: list, players: l
                 new_room = room
                 break
         new_room.occupants.append(player_profile.name)
-        player_profile.x, player_profile.y = new_room.x, new_room.y
+        player_profile.current_room = new_room
         if new_room not in player_profile.visited_rooms:
             player_profile.visited_rooms.append(new_room)
         room_info.occupants.append(swapped_player.name)
-        swapped_player.x, swapped_player.y = room_info.x, room_info.y
+        swapped_player.current_room = room_info
         if room_info not in swapped_player.visited_rooms:
             swapped_player.visited_rooms.append(room_info)
         swapped_player.state = ["default", None]  # Prevents stuck spot from carrying over
@@ -644,7 +641,7 @@ def recall(room_info: v.Room, player_profile: v.Player, rooms: list, players: li
     if v.r.randint(0, 2 - player_profile.difficulty) == 0:  # Can fail for sanity
         room_info.occupants.remove(player_profile.name)
         rooms[0].occupants.append(player_profile.name)
-        player_profile.x, player_profile.y = 0, 0  # Room generation always starts at 0, 0 with the home room
+        player_profile.current_room = v.STARTING_ROOM
         sent_home = True
     else:
         sent_home = False
