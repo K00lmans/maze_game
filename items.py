@@ -116,7 +116,7 @@ def encountered_goblin(player: v.Player, room: v.Room, placed_item: list):
 def move_goblin(rooms: list, room: v.Room):
     """Logic for moving the goblin"""
     room.placed_items.remove(encountered_goblin)
-    # He can cross the whole maze instantly because it is a fast little goober
+    # It can cross the whole maze instantly because it is a fast little goober
     new_room = v.r.choice(rooms[:-1])  # Prevents it from being in the goal room
     new_room.placed_items.append(encountered_goblin)
 
