@@ -245,7 +245,7 @@ def generate_maze_image(rooms_to_display, player=None):
     return map_image
 
 
-def find_path_to_goal(starting_room):
+def find_path_to_goal(starting_room, target_room):
     """Finds the path to the goal using the A* pathfinder algorythm
 
     The way this works is that each room is assigned a score value that determines an estimate of how likely it is that
@@ -254,6 +254,35 @@ def find_path_to_goal(starting_room):
     it came from is stored as its 'parent' value that way once the goal is reached you can simply follow the parents
     back to the starting room. For this implementation score is calculated by number of rooms between the forthcoming
     room and the starting room, plus both the vertical and horizontal distance of that room to the goal."""
+    # Each room is represented as a sublist which takes the form ["room class", "list index of parent"]
     checked_rooms = []
-    # The sub-list is structured as ["room object", "score", "parent"]
-    rooms_to_check = [[starting_room, -1, None]]
+    path_found = False
+    # The sub-list is structured as ["room object", "score", ["list index of parent", "distance to start"]]
+    rooms_to_check = [[starting_room, -1, [None, 0]]] # The -1 is a placeholder value
+    while not path_found:
+        lowest_cost_room = rooms_to_check[0]
+        for room in rooms_to_check:
+            if room[1] < lowest_cost_room[1]:
+                lowest_cost_room = room
+        rooms_to_check.remove(lowest_cost_room)
+        checked_rooms.append([lowest_cost_room[0], lowest_cost_room[2][0]])
+        for neighbor in lowest_cost_room[0].neighbors.values():
+            already_checked = False
+            for room in checked_rooms:
+                if room[0] == neighbor:
+                    already_checked = True
+                    break
+            if not already_checked:
+                rooms_to_check.append([neighbor, (lowest_cost_room[2][1] + 1) + (abs(neighbor.x - target_room.x) +
+                                                                                 abs(neighbor.y - target_room.y)),
+                                       [len(checked_rooms) - 1, lowest_cost_room[2][1] + 1]])
+        if lowest_cost_room[0] == target_room:
+            path_found = True
+
+    path = [checked_rooms[-1][0]]
+    current_room = checked_rooms[-1]
+    while current_room[1] is not None:
+        current_room = checked_rooms[current_room[1]]
+        path.append(current_room[0])
+    path.reverse()
+    return path
