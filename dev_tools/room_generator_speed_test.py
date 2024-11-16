@@ -10,7 +10,6 @@ This code is not written for usability, use at your own risk.
 Because I'm lazy, you have to put the times into the file yourself."""
 
 from maze_generation import generate_maze_layout
-from time import time
 import global_vars as v
 
 
@@ -23,9 +22,9 @@ average_times = []
 while loops <= 46:
     set_average_times = []
     for test in range(100):
-        start_time = time()
+        start_time = v.t.time()
         generate_maze_layout(50 * loops)
-        stop_time = time()
+        stop_time = v.t.time()
         set_average_times.append((stop_time - start_time) * 1000)
         print(f"\n{test + 1}% done with set {loops} of 46")
     average_times.append(sum(set_average_times)/len(set_average_times))
